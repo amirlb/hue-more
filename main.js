@@ -20,12 +20,14 @@ function init() {
 
     let max_x = (BOARD_SIZE - 1) * 4;
     let max_y = (BOARD_SIZE - 1) * 2;
-    let r0 = Math.random()*128, r1 = 224 + Math.random()*32;
-    if (Math.random() < 0.5) [r0, r1] = [r1, r0];
-    let g0 = Math.random()*128, g1 = 224 + Math.random()*32;
-    if (Math.random() < 0.5) [g0, g1] = [g1, g0];
-    let b0 = Math.random()*128, b1 = 224 + Math.random()*32;
-    if (Math.random() < 0.5) [b0, b1] = [b1, b0];
+    let r0, r1, g0, g1, b0, b1;
+    [r0, r1] = randomRange(32, 96, 224, 256);
+    [g0, g1] = randomRange( 0, 96,   0, 256);
+    [b0, b1] = randomRange(32, 96, 224, 256);
+    if ((r0 < r1) != (g0 < g1)) {
+        // prevent green-pink-puke color scheme
+        [g0, g1] = [g1, g0];
+    }
     for (let y = 0; y <= max_y; y++) {
         let min_x = Math.abs(y - (BOARD_SIZE - 1));
         for (let x = min_x; x <= max_x - min_x; x += 2) {
@@ -60,6 +62,16 @@ function isCorner(x, y) {
     if (y == BOARD_SIZE - 1)
         return (x == 0 || x == (BOARD_SIZE - 1) * 4);
     return false;
+}
+
+function randomRange(lo0, lo1, hi0, hi1)
+{
+    let lo = lo0 + Math.random() * (lo1 - lo0);
+    let hi = hi0 + Math.random() * (hi1 - hi0);
+    if (Math.random() < 0.5)
+        return [lo, hi];
+    else
+        return [hi, lo];
 }
 
 function shuffle(a) {

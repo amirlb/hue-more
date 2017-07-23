@@ -21,9 +21,9 @@ function init() {
     let max_x = (BOARD_SIZE - 1) * 4;
     let max_y = (BOARD_SIZE - 1) * 2;
     let r0, r1, g0, g1, b0, b1;
-    [r0, r1] = randomRange(32, 96, 224, 256);
-    [g0, g1] = randomRange( 0, 96,   0, 256);
-    [b0, b1] = randomRange(32, 96, 224, 256);
+    [r0, r1] = randomRange(32, 160, 32, 256);
+    [g0, g1] = randomRange( 0,  96,  0, 256);
+    [b0, b1] = randomRange(32, 160, 32, 256);
     if ((r0 < r1) != (g0 < g1)) {
         // prevent green-pink-puke color scheme
         [g0, g1] = [g1, g0];

@@ -1,6 +1,6 @@
 "use strict";
 
-const HEXAGON_SIZE = 60;
+const HEXAGON_SIZE = 100;
 const MARGIN = 20;
 const BOARD_SIZE = 4;
 
@@ -20,12 +20,19 @@ function init() {
 
     let max_x = (BOARD_SIZE - 1) * 4;
     let max_y = (BOARD_SIZE - 1) * 2;
+    let r0 = Math.random()*128, r1 = 224 + Math.random()*32;
+    if (Math.random() < 0.5) [r0, r1] = [r1, r0];
+    let g0 = Math.random()*128, g1 = 224 + Math.random()*32;
+    if (Math.random() < 0.5) [g0, g1] = [g1, g0];
+    let b0 = Math.random()*128, b1 = 224 + Math.random()*32;
+    if (Math.random() < 0.5) [b0, b1] = [b1, b0];
     for (let y = 0; y <= max_y; y++) {
         let min_x = Math.abs(y - (BOARD_SIZE - 1));
         for (let x = min_x; x <= max_x - min_x; x += 2) {
-            let r = 96 + x/max_x*(240-96);
-            let b = 96 + y/max_y*(240-96);
-            let color = 'rgb('+r+', 0, '+b+')';
+            let r = Math.floor(r0 + x/max_x*(r1-r0));
+            let g = Math.floor(g0 + x/max_x*(g1-g0));
+            let b = Math.floor(b0 + y/max_y*(b1-b0));
+            let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
             if (isCorner(x, y)) {
                 let elt = addHexagon(color, x, y);
                 board.appendChild(elt);
@@ -56,9 +63,18 @@ function isCorner(x, y) {
 }
 
 function shuffle(a) {
-    for (let i = a.length; i; i--) {
-        let j = Math.floor(Math.random() * i);
-        [a[i - 1], a[j]] = [a[j], a[i - 1]];
+    const easy = 0; // only this many swaps
+    if (easy) {
+        for (let i = 0; i < easy; i++) {
+            let j1 = Math.floor(Math.random() * (a.length - 1));
+            let j2 = Math.floor(Math.random() * (a.length - 1));
+            [a[j1], a[j2]] = [a[j2], a[j1]];
+        }
+    } else {
+        for (let i = a.length; i; i--) {
+            let j = Math.floor(Math.random() * i);
+            [a[i - 1], a[j]] = [a[j], a[i - 1]];
+        }
     }
 }
 
@@ -74,7 +90,7 @@ function addHexagon(color, x, y) {
     elt.style.color = color;
     elt.style.position = 'absolute'
     elt.style.left = (HEXAGON_SIZE * x * 0.5 + 20) + 'px';
-    elt.style.top = (HEXAGON_SIZE * y * 0.85 + 20) + 'px';
+    elt.style.top = (HEXAGON_SIZE * y * 0.86 + 20) + 'px';
     elt.classList.add('hexagon');
     elt.setAttribute('id', 'hex_'+x+'_'+y);
     elt.setAttribute('draggable', 'true');
@@ -135,7 +151,7 @@ function onDrop(event) {
         win.classList.remove('hidden');
         win.classList.add('appear');
         win.style.width = (2 * MARGIN + (BOARD_SIZE * 2 - 1) * HEXAGON_SIZE) + 'px';
-        win.style.height = (2 * MARGIN + (BOARD_SIZE * 1.7 - 0.7) * HEXAGON_SIZE) + 'px';
+        win.style.height = (2 * MARGIN + (BOARD_SIZE * 1.72 - 0.72) * HEXAGON_SIZE) + 'px';
     }
 }
 

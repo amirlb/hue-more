@@ -13,6 +13,7 @@ body {
     background-color: rgba(255, 255, 255, 0.25);
     color: gold;
     -webkit-text-stroke: 0.5px black;
+    cursor: default;
 }
 @-webkit-keyframes appearKeyframes { 
     from {
@@ -39,8 +40,10 @@ body {
     top: 50%;
     transform: translateY(-50%);
     text-align: center;
-    font-size: 96px;
-    font-variant: small-caps;
+    font-size: 144px;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .for_dnd {
@@ -55,25 +58,25 @@ body {
 .hexagon {
     display: inline-block;
     position: relative;
-    width: 60px;
-    height: 34.64px;
+    width: 100px;
+    height: 57.74px;
     background-color: currentColor;
-    margin: 17.32px 0;
+    margin: 28.87px 0;
 }
 .hexagon:before,
 .hexagon:after {
     content: "";
     position: absolute;
     width: 0;
-    border-left: 30px solid transparent;
-    border-right: 30px solid transparent;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
 }
 .hexagon:before {
     bottom: 100%;
-    border-bottom: 17.32px solid currentColor;
+    border-bottom: 28.87px solid currentColor;
 }
 .hexagon:after {
     top: 100%;
     width: 0;
-    border-top: 17.32px solid currentColor;
+    border-top: 28.87px solid currentColor;
 }

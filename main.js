@@ -4,7 +4,7 @@ const HEXAGON_SIZE = 100;
 const MARGIN = 20;
 const BOARD_SIZE = 4;
 
-var dragged_elt_id; // ugly hack: there's no way to detect "drag enter" only on other elements...
+let dragged_elt_id; // ugly hack: there's no way to detect "drag enter" only on other elements...
 
 
 function init() {
@@ -136,6 +136,7 @@ function onDrag(event) {
         return;
 
     dragged_elt_id = this.id;
+    event.dataTransfer.setData('text/plain', null); // apparently, this is required for firefox to allow drag & drop?
 
     let canvas = document.getElementsByTagName('canvas')[0];
     canvas.width = HEXAGON_SIZE;
@@ -151,6 +152,7 @@ function onDrag(event) {
 }
 
 function onDrop(event) {
+    event.preventDefault();
     if (this.getAttribute('corner') || !dragged_elt_id)
         return;
 

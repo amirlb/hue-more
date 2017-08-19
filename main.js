@@ -1,14 +1,58 @@
 "use strict";
 
+const Levels = {
+    Easy: {
+        name: 'Easy',
+        board_size: 3,
+        fixed_types: ['corner', 'side']
+    },
+    Medium: {
+        name: 'Medium',
+        board_size: 4,
+        fixed_types: ['corner', 'side']
+    },
+    Hard: {
+        name: 'Hard',
+        board_size: 4,
+        fixed_types: ['corner']
+    }
+};
+
+let Settings = {
+    getLevel: function() {
+        return Levels[localStorage.getItem('level') || 'Easy'];
+    },
+    setLevel: function(level) {
+        if (!(level in Levels))
+            throw ('Settings.setLevel called with ' + level);
+        localStorage.setItem('level', level);
+    }
+};
+
 const HEXAGON_SIZE = 100;
 const MARGIN = 20;
-const BOARD_SIZE = 4;
 
 let dragged_elt_id; // ugly hack: there's no way to detect "drag enter" only on other elements...
 
 
 function init() {
-    document.getElementById('win').classList.add('hidden');
+    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            Settings.setLevel(this.value);
+            startGame();
+        });
+    });
+
+    startGame();
+}
+
+function startGame() {
+    let level = Settings.getLevel();
+
+    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+        if (radio.value === level.name)
+            radio.checked = true;
+    });
 
     let board = document.getElementById('board');
     while (board.firstChild) {
@@ -18,8 +62,8 @@ function init() {
     let locations = [];
     let colors = [];
 
-    let max_x = (BOARD_SIZE - 1) * 4;
-    let max_y = (BOARD_SIZE - 1) * 2;
+    let max_x = (level.board_size - 1) * 4;
+    let max_y = (level.board_size - 1) * 2;
     let r0, r1, g0, g1, b0, b1;
     [r0, r1] = randomRange(32, 160, 32, 256);
     [g0, g1] = randomRange( 0,  96,  0, 256);
@@ -29,16 +73,22 @@ function init() {
         [g0, g1] = [g1, g0];
     }
     for (let y = 0; y <= max_y; y++) {
-        let min_x = Math.abs(y - (BOARD_SIZE - 1));
+        let min_x = Math.abs(y - (level.board_size - 1));
         for (let x = min_x; x <= max_x - min_x; x += 2) {
             let r = Math.floor(r0 + x/max_x*(r1-r0));
             let g = Math.floor(g0 + x/max_x*(g1-g0));
             let b = Math.floor(b0 + y/max_y*(b1-b0));
             let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-            if (isCorner(x, y)) {
-                let elt = addHexagon(color, x, y);
-                board.appendChild(elt);
-                elt.setAttribute('corner', true);
+
+            let position_type = 'middle';
+            if ([0, level.board_size-1, max_y].includes(y) && [min_x, max_x-min_x].includes(x))
+                position_type = 'corner';
+            else if ([0, max_y].includes(y) || [min_x, max_x-min_x].includes(x))
+                position_type = 'side';
+            let is_fixed = level.fixed_types.includes(position_type);
+
+            if (is_fixed) {
+                board.appendChild(addHexagon(color, x, y, true));
             } else {
                 locations.push([x, y]);
                 colors.push(color);
@@ -50,18 +100,16 @@ function init() {
     shuffle(colors);
 
     for (let i = 0; i < locations.length; i++) {
-        let elt = addHexagon(colors[i], locations[i][0], locations[i][1]);
+        let elt = addHexagon(colors[i], locations[i][0], locations[i][1], false);
         board.appendChild(elt);
         elt.setAttribute('expectedColor', originalColors[i]);
     }
-}
 
-function isCorner(x, y) {
-    if (y == 0 || y == (BOARD_SIZE - 1) * 2)
-        return (x == BOARD_SIZE - 1 || x == (BOARD_SIZE - 1) * 3);
-    if (y == BOARD_SIZE - 1)
-        return (x == 0 || x == (BOARD_SIZE - 1) * 4);
-    return false;
+    let win = document.getElementById('win');
+    win.classList.add('hidden');
+    win.classList.remove('appear');
+    win.style.width = (2 * MARGIN + (level.board_size * 2 - 1) * HEXAGON_SIZE) + 'px';
+    win.style.height = (2 * MARGIN + (level.board_size * 1.72 - 0.72) * HEXAGON_SIZE) + 'px';
 }
 
 function randomRange(lo0, lo1, hi0, hi1)
@@ -97,7 +145,7 @@ function rgb2hex(r, g, b) {
     return '#' + r + g + b;
 }
 
-function addHexagon(color, x, y) {
+function addHexagon(color, x, y, is_fixed) {
     let elt = document.createElement('span');
     elt.style.color = color;
     elt.style.position = 'absolute'
@@ -105,14 +153,14 @@ function addHexagon(color, x, y) {
     elt.style.top = (HEXAGON_SIZE * y * 0.86 + 20) + 'px';
     elt.classList.add('hexagon');
     elt.setAttribute('id', 'hex_'+x+'_'+y);
-    elt.setAttribute('draggable', 'true');
-    elt.addEventListener('mousedown', function(event) {
-        if (this.getAttribute('corner'))
-            event.preventDefault();
-    });
-    elt.addEventListener('dragstart', onDrag);
+    if (is_fixed) {
+        elt.setAttribute('unmovable', true);
+    } else {
+        elt.setAttribute('draggable', true);
+        elt.addEventListener('dragstart', onDrag);
+    }
     elt.addEventListener('dragover', function(event) {
-        if (this.getAttribute('corner') || !dragged_elt_id)
+        if (this.getAttribute('unmovable') || !dragged_elt_id)
             return;
 
         if (dragged_elt_id != this.id) {
@@ -132,9 +180,6 @@ function addHexagon(color, x, y) {
 }
 
 function onDrag(event) {
-    if (this.getAttribute('corner'))
-        return;
-
     dragged_elt_id = this.id;
     event.dataTransfer.setData('text/plain', null); // apparently, this is required for firefox to allow drag & drop?
 
@@ -153,7 +198,7 @@ function onDrag(event) {
 
 function onDrop(event) {
     event.preventDefault();
-    if (this.getAttribute('corner') || !dragged_elt_id)
+    if (this.getAttribute('unmovable') || !dragged_elt_id)
         return;
 
     this.removeAttribute('drop-active');
@@ -164,8 +209,6 @@ function onDrop(event) {
         let win = document.getElementById('win');
         win.classList.remove('hidden');
         win.classList.add('appear');
-        win.style.width = (2 * MARGIN + (BOARD_SIZE * 2 - 1) * HEXAGON_SIZE) + 'px';
-        win.style.height = (2 * MARGIN + (BOARD_SIZE * 1.72 - 0.72) * HEXAGON_SIZE) + 'px';
     }
 }
 
@@ -173,7 +216,7 @@ function allCorrect() {
     let hexagons = document.getElementsByClassName('hexagon');
     for (let i = 0; i < hexagons.length; i++) {
         let elt = hexagons[i];
-        if (elt.getAttribute('corner'))
+        if (elt.getAttribute('unmovable'))
             continue;
         if (elt.getAttribute('expectedColor') != elt.style.color.toString())
             return false;

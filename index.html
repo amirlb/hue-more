@@ -9,8 +9,13 @@
 </head>
 <body onload="init()">
 <div id="board"></div>
-<div id="win" class="hidden" onclick="init()">
+<div id="win" class="hidden" onclick="startGame()">
     <span id="win-text">YOU<br/>WIN!</span>
+</div>
+<div id="menu">
+    <input type="radio" name="level" id="easy" value="Easy"/><label for="easy">Easy</label>
+    <input type="radio" name="level" id="medium" value="Medium"><label for="medium">Medium</label>
+    <input type="radio" name="level" id="hard" value="Hard"><label for="hard">Hard</label>
 </div>
 <canvas class="for_dnd"></canvas>
 <img class="for_dnd"></img>

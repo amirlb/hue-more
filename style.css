@@ -13,7 +13,7 @@ body {
 input[type="radio"][name="level"] {
     display: none;
 }
-label {
+input[type="radio"][name="level"] + label {
     display: block;
     font-size: x-large;
     left: 0;

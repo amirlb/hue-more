@@ -4,17 +4,26 @@ const Levels = {
     Easy: {
         name: 'Easy',
         board_size: 3,
-        fixed_types: ['corner', 'side']
+        fixed_types: ['corner', 'side'],
+        valid_color_diff: function(diff) {return diff >= 100;}
     },
     Medium: {
         name: 'Medium',
         board_size: 4,
-        fixed_types: ['corner', 'side']
+        fixed_types: ['corner', 'side'],
+        valid_color_diff: function(diff) {return diff >= 100;}
     },
     Hard: {
         name: 'Hard',
         board_size: 4,
-        fixed_types: ['corner']
+        fixed_types: ['corner'],
+        valid_color_diff: function(diff) {return diff >= 100;}
+    },
+    Extreme: {
+        name: 'Extreme',
+        board_size: 4,
+        fixed_types: ['corner'],
+        valid_color_diff: function(diff) {return 15 <= diff && diff < 30;}
     }
 };
 
@@ -76,20 +85,13 @@ function startGame() {
 
     let max_x = (level.board_size - 1) * 4;
     let max_y = (level.board_size - 1) * 2;
-    let r0, r1, g0, g1, b0, b1;
-    [r0, r1] = randomRange(32, 160, 32, 256);
-    [g0, g1] = randomRange( 0,  96,  0, 256);
-    [b0, b1] = randomRange(32, 160, 32, 256);
-    if ((r0 < r1) != (g0 < g1)) {
-        // prevent green-pink-puke color scheme
-        [g0, g1] = [g1, g0];
-    }
+
+    let colorScheme = randomColorScheme(level.valid_color_diff);
+
     for (let y = 0; y <= max_y; y++) {
         let min_x = Math.abs(y - (level.board_size - 1));
         for (let x = min_x; x <= max_x - min_x; x += 2) {
-            let r = Math.floor(r0 + x/max_x*(r1-r0));
-            let g = Math.floor(g0 + x/max_x*(g1-g0));
-            let b = Math.floor(b0 + y/max_y*(b1-b0));
+            let [r, g, b] = applyColorScheme(colorScheme, [x/max_x, y/max_y]);
             let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
 
             let position_type = 'middle';
@@ -133,14 +135,56 @@ function updateCheckMarks() {
     });
 }
 
-function randomRange(lo0, lo1, hi0, hi1)
-{
-    let lo = lo0 + Math.random() * (lo1 - lo0);
-    let hi = hi0 + Math.random() * (hi1 - hi0);
+function randomColorScheme(colorCondition) {
+    let corners = [[0.25,0], [0.75,0], [0,0.5], [1,0.5], [0.25,1], [0.75,1]]
+    while (true) {
+        let colorScheme = [randomDimension(), randomDimension(), randomDimension()];
+        // green-pink color scheme hurts my eye
+        if (colorScheme[0][1] < -0.1 && colorScheme[1][1] > 0.1)
+            continue;
+        if (colorScheme[1][1] < -0.1 && colorScheme[0][1] > 0.1)
+            continue;
+        if (colorScheme[0][2] < -0.1 && colorScheme[1][2] > 0.1)
+            continue;
+        if (colorScheme[1][2] < -0.1 && colorScheme[0][2] > 0.1)
+            continue;
+        let cornerColors = corners.map(function(loc) {
+            return applyColorScheme(colorScheme, loc);
+        });
+        let diff = 1e6;
+        for (let i = 0; i < cornerColors.length; i++)
+            for (let j = 0; j < i; j++)
+                diff = Math.min(diff, colorDifference(cornerColors[i], cornerColors[j]));
+        if (colorCondition(diff)) {
+            return colorScheme;
+        }
+    }
+}
+
+function applyColorScheme(scheme, xy) {
+    return scheme.map(function(channel) {
+        let base = channel[0], dx = channel[1], dy = channel[2];
+        return Math.floor(255 * (base + dx * xy[0] + dy * xy[1]));
+    });
+}
+
+function randomDimension() {
+    let low = Math.random(), high = Math.random();
+    if (high < low) [low, high] = [high, low];
+    let dx = Math.random() * (high - low);
+    let dy = (high - low) - dx;
     if (Math.random() < 0.5)
-        return [lo, hi];
-    else
-        return [hi, lo];
+        [low, dy] = [low + dy, -dy];
+    if (Math.random() < 0.5)
+        [low, dx] = [low + dx, -dx];
+    return [low, dx, dy];
+}
+
+function colorDifference(c1, c2) {
+    // TODO: find better difference function
+    return Math.sqrt(0.5 * Math.pow(c1[0] - c2[0], 2) +
+                     Math.pow(c1[1] - c2[1], 2) +
+                     0.7 * Math.pow(c1[2] - c2[2], 2));
 }
 
 function shuffle(a) {
@@ -157,13 +201,6 @@ function shuffle(a) {
             [a[i - 1], a[j]] = [a[j], a[i - 1]];
         }
     }
-}
-
-function rgb2hex(r, g, b) {
-    r = (r<16 ? '0' : '') + r.toString(16);
-    g = (g<16 ? '0' : '') + g.toString(16);
-    b = (b<16 ? '0' : '') + b.toString(16);
-    return '#' + r + g + b;
 }
 
 function addHexagon(color, x, y, is_fixed) {

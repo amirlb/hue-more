@@ -105,3 +105,11 @@ input[type="radio"][name="level"]:checked + label {
     width: 0;
     border-top: 28.87px solid currentColor;
 }
+
+.fix_mark {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    border: 8px solid black;
+    border-radius: 50%;
+}

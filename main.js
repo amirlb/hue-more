@@ -26,6 +26,12 @@ let Settings = {
         if (!(level in Levels))
             throw ('Settings.setLevel called with ' + level);
         localStorage.setItem('level', level);
+    },
+    getMarkFixed: function() {
+        return (localStorage.getItem('markFixed') || 'true') === 'true';
+    },
+    setMarkFixed: function(markFixed) {
+        localStorage.setItem('markFixed', markFixed ? 'true' : 'false');
     }
 };
 
@@ -43,6 +49,11 @@ function init() {
         });
     });
 
+    document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
+        Settings.setMarkFixed(this.checked);
+        updateCheckMarks();
+    });
+
     startGame();
 }
 
@@ -53,6 +64,7 @@ function startGame() {
         if (radio.value === level.name)
             radio.checked = true;
     });
+    document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
 
     let board = document.getElementById('board');
     while (board.firstChild) {
@@ -105,11 +117,20 @@ function startGame() {
         elt.setAttribute('expectedColor', originalColors[i]);
     }
 
+    updateCheckMarks();
+
     let win = document.getElementById('win');
     win.classList.add('hidden');
     win.classList.remove('appear');
     win.style.width = (2 * MARGIN + (level.board_size * 2 - 1) * HEXAGON_SIZE) + 'px';
     win.style.height = (2 * MARGIN + (level.board_size * 1.72 - 0.72) * HEXAGON_SIZE) + 'px';
+}
+
+function updateCheckMarks() {
+    let display = Settings.getMarkFixed() ? 'initial' : 'none';
+    document.querySelectorAll('.fix_mark').forEach(function(elt) {
+        elt.style.display = display;
+    });
 }
 
 function randomRange(lo0, lo1, hi0, hi1)
@@ -155,6 +176,7 @@ function addHexagon(color, x, y, is_fixed) {
     elt.setAttribute('id', 'hex_'+x+'_'+y);
     if (is_fixed) {
         elt.setAttribute('unmovable', true);
+        elt.innerHTML = '<span class="fix_mark"/>';
     } else {
         elt.setAttribute('draggable', true);
         elt.addEventListener('dragstart', onDrag);

@@ -51,8 +51,10 @@ let DragAndDrop = {
     origin: null,
 
     reset: function() {
+        document.getElementById('msg').innerText = '1';
         DragAndDrop.board = document.getElementById('board');
         DragAndDrop.board.removeEventListener('mousemove', DragAndDrop.movement);
+        DragAndDrop.board.removeEventListener('touchmove', DragAndDrop.movement);
         DragAndDrop.board.removeEventListener('mouseup', DragAndDrop.end);
         DragAndDrop.board.removeEventListener('mouseleave', DragAndDrop.end);
         DragAndDrop.board.querySelectorAll('polygon').forEach(function(elt) {
@@ -68,6 +70,7 @@ let DragAndDrop = {
         DragAndDrop.origin = null;
         DragAndDrop.board.addEventListener('mouseup', DragAndDrop.end);
         DragAndDrop.board.addEventListener('mouseleave', DragAndDrop.end);
+        document.getElementById('msg').innerText = 'x';
     },
 
     start: function(event) {
@@ -79,8 +82,10 @@ let DragAndDrop = {
 
         DragAndDrop.draggedElement = event.target;
         DragAndDrop.draggedElement.classList.add('draggedElement');
-        DragAndDrop.origin = {x: event.clientX, y: event.clientY};
+        let position = ('targetTouches' in event) ? event.targetTouches[0] : event;
+        DragAndDrop.origin = {x: position.clientX, y: position.clientY};
         DragAndDrop.board.addEventListener('mousemove', DragAndDrop.movement);
+        DragAndDrop.board.addEventListener('touchmove', DragAndDrop.movement);
         DragAndDrop.board.querySelectorAll('polygon[droppable=true]').forEach(function(elt) {
             elt.addEventListener('mousemove', DragAndDrop.over);
             elt.addEventListener('mouseout', DragAndDrop.notover);
@@ -95,8 +100,10 @@ let DragAndDrop = {
             return;
         }
 
-        let dx = event.clientX - DragAndDrop.origin.x,
-            dy = event.clientY - DragAndDrop.origin.y;
+        // console.log(document.elementFromPoint(event.elientX, event.clientY).id);
+        let position = ('targetTouches' in event) ? event.targetTouches[0] : event;
+        let dx = position.clientX - DragAndDrop.origin.x,
+            dy = position.clientY - DragAndDrop.origin.y;
         DragAndDrop.draggedElement.transform.baseVal[0].setTranslate(dx, dy);
         event.preventDefault();
     },
@@ -120,6 +127,7 @@ let DragAndDrop = {
             }
         }
         // switch / start hover
+        document.getElementById('msg').innerText = event.target.id;
         DragAndDrop.targetElement = event.target;
         DragAndDrop.targetElement.classList.add('dropTarget');
         event.preventDefault();
@@ -347,6 +355,7 @@ function createHexagon(info) {
     if (info.isMovable) {
         elt.setAttribute('droppable', true);
         elt.addEventListener('mousedown', DragAndDrop.start);
+        elt.addEventListener('touchstart', DragAndDrop.start);
     }
 
     return elt;

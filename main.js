@@ -44,88 +44,217 @@ let Settings = {
     }
 };
 
-const HEXAGON_SIZE = 100;
-const MARGIN = 20;
+let DragAndDrop = {
+    board: null,
+    draggedElement: null,
+    targetElement: null,
+    origin: null,
 
-let dragged_elt_id; // ugly hack: there's no way to detect "drag enter" only on other elements...
+    reset: function() {
+        DragAndDrop.board = document.getElementById('board');
+        DragAndDrop.board.removeEventListener('mousemove', DragAndDrop.movement);
+        DragAndDrop.board.removeEventListener('mouseup', DragAndDrop.end);
+        DragAndDrop.board.removeEventListener('mouseleave', DragAndDrop.end);
+        DragAndDrop.board.querySelectorAll('polygon').forEach(function(elt) {
+            elt.classList.remove('draggedElement');
+            elt.classList.remove('dropTarget');
+            elt.removeEventListener('mousemove', DragAndDrop.over);
+            elt.removeEventListener('mouseout', DragAndDrop.notover);
+            setHexagonPosition(elt, hexagonLocations[elt.id].current);
+            elt.transform.baseVal[0].setTranslate(0, 0);
+        });
+        DragAndDrop.draggedElement = null;
+        DragAndDrop.targetElement = null;
+        DragAndDrop.origin = null;
+        DragAndDrop.board.addEventListener('mouseup', DragAndDrop.end);
+        DragAndDrop.board.addEventListener('mouseleave', DragAndDrop.end);
+    },
+
+    start: function(event) {
+        if (DragAndDrop.draggedElement) {
+            // unexpected
+            DragAndDrop.reset();
+            return;
+        }
+
+        DragAndDrop.draggedElement = event.target;
+        DragAndDrop.draggedElement.classList.add('draggedElement');
+        DragAndDrop.origin = {x: event.clientX, y: event.clientY};
+        DragAndDrop.board.addEventListener('mousemove', DragAndDrop.movement);
+        DragAndDrop.board.querySelectorAll('polygon[droppable=true]').forEach(function(elt) {
+            elt.addEventListener('mousemove', DragAndDrop.over);
+            elt.addEventListener('mouseout', DragAndDrop.notover);
+        });
+        event.preventDefault();
+    },
+
+    movement: function(event) {
+        if (!DragAndDrop.draggedElement) {
+            // unexpected
+            DragAndDrop.reset();
+            return;
+        }
+
+        let dx = event.clientX - DragAndDrop.origin.x,
+            dy = event.clientY - DragAndDrop.origin.y;
+        DragAndDrop.draggedElement.transform.baseVal[0].setTranslate(dx, dy);
+        event.preventDefault();
+    },
+
+    over: function(event) {
+        if (!DragAndDrop.draggedElement) {
+            // unexpected
+            DragAndDrop.reset();
+            return;
+        }
+
+        if (DragAndDrop.targetElement) {
+            if (DragAndDrop.targetElement.id === event.target.id) {
+                // nothing changed
+                event.preventDefault();
+                return;
+            } else {
+                // moved to new element
+                DragAndDrop.targetElement.classList.remove('dropTarget');
+                // fall through
+            }
+        }
+        // switch / start hover
+        DragAndDrop.targetElement = event.target;
+        DragAndDrop.targetElement.classList.add('dropTarget');
+        event.preventDefault();
+    },
+
+    notover: function(event) {
+        if (!DragAndDrop.draggedElement) {
+            // unexpected
+            DragAndDrop.reset();
+            return;
+        }
+
+        if (DragAndDrop.targetElement && DragAndDrop.targetElement.id === event.target.id) {
+            DragAndDrop.targetElement.classList.remove('dropTarget');
+            DragAndDrop.targetElement = null;
+        }
+        event.preventDefault();
+    },
+
+    end: function(event) {
+        if (DragAndDrop.draggedElement && DragAndDrop.targetElement) {
+            let i1 = DragAndDrop.draggedElement.id,
+                i2 = DragAndDrop.targetElement.id;
+            [hexagonLocations[i1].current, hexagonLocations[i2].current] = [hexagonLocations[i2].current, hexagonLocations[i1].current];
+        }
+        DragAndDrop.reset();
+        if (allCorrect()) {
+            let win = document.getElementById('win');
+            win.classList.remove('hidden');
+            win.classList.add('appear');
+        }
+        event.preventDefault();
+    }
+}
+
+let hexagonLocations = {};
 
 
 function init() {
-    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            Settings.setLevel(this.value);
-            startGame();
-        });
-    });
+    // document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+    //     radio.addEventListener('change', function() {
+    //         Settings.setLevel(this.value);
+    //         startGame();
+    //     });
+    // });
 
-    document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
-        Settings.setMarkFixed(this.checked);
-        updateCheckMarks();
-    });
+    // document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
+    //     Settings.setMarkFixed(this.checked);
+    //     updateCheckMarks();
+    // });
+
+    window.addEventListener('resize', setBoardCoordinates);
+    DragAndDrop.reset();
 
     startGame();
+}
+
+function setBoardCoordinates() {
+    const MARGIN = 20;
+
+    let board = document.getElementById('board');
+    let width = board.width.baseVal.value, height = board.height.baseVal.value;
+    let level = Settings.getLevel();
+    const s3 = Math.sqrt(3);
+    let hexagon_size = Math.min((width - MARGIN * 2) / (level.board_size * 4 - 2),
+                                (height - MARGIN * 2) / (level.board_size * 2 * s3 - 2 / s3));
+    document.querySelectorAll('polygon').forEach(function(hexagon) {
+        hexagon.transform.baseVal[1].setTranslate(width / 2, height / 2);
+        hexagon.transform.baseVal[2].setScale(hexagon_size, hexagon_size);
+    });
 }
 
 function startGame() {
     let level = Settings.getLevel();
 
-    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-        if (radio.value === level.name)
-            radio.checked = true;
-    });
-    document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
+    // document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+    //     if (radio.value === level.name)
+    //         radio.checked = true;
+    // });
+    // document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
 
     let board = document.getElementById('board');
     while (board.firstChild) {
         board.removeChild(board.firstChild);
     }
 
-    let locations = [];
-    let colors = [];
-
-    let max_x = (level.board_size - 1) * 4;
-    let max_y = (level.board_size - 1) * 2;
-
     let colorScheme = randomColorScheme(level.valid_color_diff);
 
-    for (let y = 0; y <= max_y; y++) {
-        let min_x = Math.abs(y - (level.board_size - 1));
-        for (let x = min_x; x <= max_x - min_x; x += 2) {
-            let [r, g, b] = applyColorScheme(colorScheme, [x/max_x, y/max_y]);
+    let fixed = [], movable = [];
+    
+    let n_layers = level.board_size - 1;
+    for (let y = -n_layers; y <= n_layers; y++) {
+        let max_x = n_layers * 2 - Math.abs(y);
+        for (let x = -max_x; x <= max_x; x += 2) {
+            let [r, g, b] = applyColorScheme(colorScheme, [x/n_layers/4+0.5, y/n_layers/2+0.5]);
             let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
 
             let position_type = 'middle';
-            if ([0, level.board_size-1, max_y].includes(y) && [min_x, max_x-min_x].includes(x))
+            if ([-n_layers, 0, n_layers].includes(y) && [-max_x, max_x].includes(x))
                 position_type = 'corner';
-            else if ([0, max_y].includes(y) || [min_x, max_x-min_x].includes(x))
+            else if ([-n_layers, n_layers].includes(y) || [-max_x, max_x].includes(x))
                 position_type = 'side';
             let is_fixed = level.fixed_types.includes(position_type);
 
-            if (is_fixed) {
-                board.appendChild(addHexagon(color, x, y, true));
-            } else {
-                locations.push([x, y]);
-                colors.push(color);
-            }
+            if (is_fixed)
+                fixed.push({position: [x, y], color});
+            else
+                movable.push({position: [x, y], color});
         }
     }
 
-    let originalColors = colors.slice();
-    shuffle(colors);
+    let original = fixed.concat(movable);
+    let mixed = fixed.concat(shuffle(movable));
 
-    for (let i = 0; i < locations.length; i++) {
-        let elt = addHexagon(colors[i], locations[i][0], locations[i][1], false);
-        board.appendChild(elt);
-        elt.setAttribute('expectedColor', originalColors[i]);
+    hexagonLocations = {};
+
+    for (let i = 0; i < original.length; i++) {
+        let id = `hexagon_${original[i].position[0]}_${original[i].position[1]}`;
+        hexagonLocations[id] = {current: mixed[i].position,
+                                correct: original[i].position};
+        board.appendChild(createHexagon({
+            id,
+            position: mixed[i].position,
+            color: original[i].color,
+            isMovable: (i >= fixed.length)
+        }));
     }
 
+    setTimeout(setBoardCoordinates, 0);
+    
     updateCheckMarks();
 
     let win = document.getElementById('win');
     win.classList.add('hidden');
     win.classList.remove('appear');
-    win.style.width = (2 * MARGIN + (level.board_size * 2 - 1) * HEXAGON_SIZE) + 'px';
-    win.style.height = (2 * MARGIN + (level.board_size * 1.72 - 0.72) * HEXAGON_SIZE) + 'px';
 }
 
 function updateCheckMarks() {
@@ -189,6 +318,7 @@ function colorDifference(c1, c2) {
 
 function shuffle(a) {
     const easy = 0; // only this many swaps
+    a = a.slice();
     if (easy) {
         for (let i = 0; i < easy; i++) {
             let j1 = Math.floor(Math.random() * (a.length - 1));
@@ -201,83 +331,43 @@ function shuffle(a) {
             [a[i - 1], a[j]] = [a[j], a[i - 1]];
         }
     }
+    return a;
 }
 
-function addHexagon(color, x, y, is_fixed) {
-    let elt = document.createElement('span');
-    elt.style.color = color;
-    elt.style.position = 'absolute'
-    elt.style.left = (HEXAGON_SIZE * x * 0.5 + 20) + 'px';
-    elt.style.top = (HEXAGON_SIZE * y * 0.86 + 20) + 'px';
-    elt.classList.add('hexagon');
-    elt.setAttribute('id', 'hex_'+x+'_'+y);
-    if (is_fixed) {
-        elt.setAttribute('unmovable', true);
-        elt.innerHTML = '<span class="fix_mark"/>';
-    } else {
-        elt.setAttribute('draggable', true);
-        elt.addEventListener('dragstart', onDrag);
+function createHexagon(info) {
+    let board = document.getElementById('board');
+    let elt = document.createElementNS(board.namespaceURI, 'polygon');
+    elt.transform.baseVal.clear();
+    elt.transform.baseVal.appendItem(board.createSVGTransform());
+    elt.transform.baseVal.appendItem(board.createSVGTransform());
+    elt.transform.baseVal.appendItem(board.createSVGTransform());
+    setHexagonPosition(elt, info.position);
+    elt.setAttribute('fill', info.color);
+    elt.setAttribute('id', info.id);
+    if (info.isMovable) {
+        elt.setAttribute('droppable', true);
+        elt.addEventListener('mousedown', DragAndDrop.start);
     }
-    elt.addEventListener('dragover', function(event) {
-        if (this.getAttribute('unmovable') || !dragged_elt_id)
-            return;
-
-        if (dragged_elt_id != this.id) {
-            this.setAttribute('drop-active', true);
-            event.preventDefault();
-        }
-    });
-    elt.addEventListener('dragleave', function(event) {
-        this.removeAttribute('drop-active');
-    });
-    elt.addEventListener('dragend', function(event) {
-        dragged_elt_id = undefined;
-    });
-    elt.addEventListener('drop', onDrop);
 
     return elt;
 }
 
-function onDrag(event) {
-    dragged_elt_id = this.id;
-    event.dataTransfer.setData('text/plain', null); // apparently, this is required for firefox to allow drag & drop?
-
-    let canvas = document.getElementsByTagName('canvas')[0];
-    canvas.width = HEXAGON_SIZE;
-    canvas.height = HEXAGON_SIZE;
-    let context = canvas.getContext('2d');
-    context.beginPath();
-    context.arc(HEXAGON_SIZE/2, HEXAGON_SIZE/2, HEXAGON_SIZE/2, 0, 2*Math.PI);
-    context.fillStyle = this.style.color.toString().replace(' ', '');
-    context.fill();
-    let img = document.getElementsByTagName('img')[0];
-    img.src = canvas.toDataURL('image/png');
-    event.dataTransfer.setDragImage(img, HEXAGON_SIZE/2, HEXAGON_SIZE/2);
-}
-
-function onDrop(event) {
-    event.preventDefault();
-    if (this.getAttribute('unmovable') || !dragged_elt_id)
-        return;
-
-    this.removeAttribute('drop-active');
-    let src = document.getElementById(dragged_elt_id);
-    dragged_elt_id = undefined;
-    [src.style.color, this.style.color] = [this.style.color, src.style.color];
-    if (allCorrect()) {
-        let win = document.getElementById('win');
-        win.classList.remove('hidden');
-        win.classList.add('appear');
-    }
+function setHexagonPosition(elt, position) {
+    const s3 = Math.sqrt(3);
+    let [x, y] = position;
+    elt.setAttribute('points', [
+        x       , y * s3 - 2.02 / s3,
+        x - 1.01, y * s3 - 1.01 / s3,
+        x - 1.01, y * s3 + 1.01 / s3,
+        x       , y * s3 + 2.02 / s3,
+        x + 1.01, y * s3 + 1.01 / s3,
+        x + 1.01, y * s3 - 1.01 / s3
+    ]);
 }
 
 function allCorrect() {
-    let hexagons = document.getElementsByClassName('hexagon');
-    for (let i = 0; i < hexagons.length; i++) {
-        let elt = hexagons[i];
-        if (elt.getAttribute('unmovable'))
-            continue;
-        if (elt.getAttribute('expectedColor') != elt.style.color.toString())
+    for (let i in hexagonLocations) {
+        if (hexagonLocations[i].current !== hexagonLocations[i].correct)
             return false;
     }
     return true;

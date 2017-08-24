@@ -14,12 +14,12 @@ body {
     height: 100%;
 }
 
-/* #menu {
+#menu {
     position: absolute;
     right: 0;
     top: 0;
     width: 10em;
-} */
+}
 
 input[type="radio"][name="level"] {
     display: none;
@@ -82,13 +82,8 @@ input[type="radio"][name="level"]:checked + label {
     line-height: 1;
 }
 
-polygon {
-    z-index: 1;
-}
-
 .draggedElement {
     pointer-events: none;
-    z-index: 2;
 }
 
 .dropTarget {
@@ -96,9 +91,5 @@ polygon {
 }
 
 .fix_mark {
-    position: absolute;
-    top: 20px;
-    left: 40px;
-    border: 8px solid black;
-    border-radius: 50%;
+    fill: black;
 }

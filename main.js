@@ -51,26 +51,26 @@ let DragAndDrop = {
     origin: null,
 
     reset: function() {
-        document.getElementById('msg').innerText = '1';
         DragAndDrop.board = document.getElementById('board');
         DragAndDrop.board.removeEventListener('mousemove', DragAndDrop.movement);
         DragAndDrop.board.removeEventListener('touchmove', DragAndDrop.movement);
         DragAndDrop.board.removeEventListener('mouseup', DragAndDrop.end);
-        DragAndDrop.board.removeEventListener('mouseleave', DragAndDrop.end);
-        DragAndDrop.board.querySelectorAll('polygon').forEach(function(elt) {
+        DragAndDrop.board.removeEventListener('touchend', DragAndDrop.end);
+        DragAndDrop.board.removeEventListener('mouseleave', DragAndDrop.reset);
+        DragAndDrop.board.removeEventListener('touchcancel', DragAndDrop.reset);
+        DragAndDrop.board.querySelectorAll('.hexagon').forEach(function(elt) {
             elt.classList.remove('draggedElement');
             elt.classList.remove('dropTarget');
-            elt.removeEventListener('mousemove', DragAndDrop.over);
-            elt.removeEventListener('mouseout', DragAndDrop.notover);
-            setHexagonPosition(elt, hexagonLocations[elt.id].current);
             elt.transform.baseVal[0].setTranslate(0, 0);
+            elt.transform.baseVal[3].setTranslate(hexagonLocations[elt.id].current[0], hexagonLocations[elt.id].current[1]);
         });
         DragAndDrop.draggedElement = null;
         DragAndDrop.targetElement = null;
         DragAndDrop.origin = null;
         DragAndDrop.board.addEventListener('mouseup', DragAndDrop.end);
-        DragAndDrop.board.addEventListener('mouseleave', DragAndDrop.end);
-        document.getElementById('msg').innerText = 'x';
+        DragAndDrop.board.addEventListener('touchend', DragAndDrop.end);
+        DragAndDrop.board.addEventListener('mouseleave', DragAndDrop.reset);
+        DragAndDrop.board.addEventListener('touchcancel', DragAndDrop.reset);
     },
 
     start: function(event) {
@@ -80,16 +80,15 @@ let DragAndDrop = {
             return;
         }
 
-        DragAndDrop.draggedElement = event.target;
+        DragAndDrop.draggedElement = this;
         DragAndDrop.draggedElement.classList.add('draggedElement');
+        // position this element on top
+        DragAndDrop.board.removeChild(DragAndDrop.draggedElement);
+        DragAndDrop.board.appendChild(DragAndDrop.draggedElement);
         let position = ('targetTouches' in event) ? event.targetTouches[0] : event;
         DragAndDrop.origin = {x: position.clientX, y: position.clientY};
         DragAndDrop.board.addEventListener('mousemove', DragAndDrop.movement);
         DragAndDrop.board.addEventListener('touchmove', DragAndDrop.movement);
-        DragAndDrop.board.querySelectorAll('polygon[droppable=true]').forEach(function(elt) {
-            elt.addEventListener('mousemove', DragAndDrop.over);
-            elt.addEventListener('mouseout', DragAndDrop.notover);
-        });
         event.preventDefault();
     },
 
@@ -100,49 +99,33 @@ let DragAndDrop = {
             return;
         }
 
-        // console.log(document.elementFromPoint(event.elientX, event.clientY).id);
         let position = ('targetTouches' in event) ? event.targetTouches[0] : event;
         let dx = position.clientX - DragAndDrop.origin.x,
             dy = position.clientY - DragAndDrop.origin.y;
         DragAndDrop.draggedElement.transform.baseVal[0].setTranslate(dx, dy);
-        event.preventDefault();
-    },
-
-    over: function(event) {
-        if (!DragAndDrop.draggedElement) {
-            // unexpected
-            DragAndDrop.reset();
-            return;
-        }
-
-        if (DragAndDrop.targetElement) {
-            if (DragAndDrop.targetElement.id === event.target.id) {
-                // nothing changed
-                event.preventDefault();
-                return;
-            } else {
-                // moved to new element
-                DragAndDrop.targetElement.classList.remove('dropTarget');
-                // fall through
+        let underPointer = document.elementFromPoint(position.clientX, position.clientY).closest('[droppable]');
+        if (underPointer) {
+            if (DragAndDrop.targetElement) {
+                if (DragAndDrop.targetElement.id === underPointer.id) {
+                    // nothing changed
+                    event.preventDefault();
+                    return;
+                } else {
+                    // moved to new element
+                    DragAndDrop.targetElement.classList.remove('dropTarget');
+                    // fall through
+                }
             }
-        }
-        // switch / start hover
-        document.getElementById('msg').innerText = event.target.id;
-        DragAndDrop.targetElement = event.target;
-        DragAndDrop.targetElement.classList.add('dropTarget');
-        event.preventDefault();
-    },
-
-    notover: function(event) {
-        if (!DragAndDrop.draggedElement) {
-            // unexpected
-            DragAndDrop.reset();
-            return;
-        }
-
-        if (DragAndDrop.targetElement && DragAndDrop.targetElement.id === event.target.id) {
-            DragAndDrop.targetElement.classList.remove('dropTarget');
-            DragAndDrop.targetElement = null;
+            // switch / start hover
+            DragAndDrop.targetElement = underPointer;
+            DragAndDrop.targetElement.classList.add('dropTarget');
+        } else {
+            // not over anything
+            if (DragAndDrop.targetElement) {
+                // left last element
+                DragAndDrop.targetElement.classList.remove('dropTarget');
+                DragAndDrop.targetElement = null;
+            }
         }
         event.preventDefault();
     },
@@ -167,17 +150,17 @@ let hexagonLocations = {};
 
 
 function init() {
-    // document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-    //     radio.addEventListener('change', function() {
-    //         Settings.setLevel(this.value);
-    //         startGame();
-    //     });
-    // });
+    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            Settings.setLevel(this.value);
+            startGame();
+        });
+    });
 
-    // document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
-    //     Settings.setMarkFixed(this.checked);
-    //     updateCheckMarks();
-    // });
+    document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
+        Settings.setMarkFixed(this.checked);
+        updateCheckMarks();
+    });
 
     window.addEventListener('resize', setBoardCoordinates);
     DragAndDrop.reset();
@@ -186,7 +169,7 @@ function init() {
 }
 
 function setBoardCoordinates() {
-    const MARGIN = 20;
+    const MARGIN = 10;
 
     let board = document.getElementById('board');
     let width = board.width.baseVal.value, height = board.height.baseVal.value;
@@ -194,20 +177,20 @@ function setBoardCoordinates() {
     const s3 = Math.sqrt(3);
     let hexagon_size = Math.min((width - MARGIN * 2) / (level.board_size * 4 - 2),
                                 (height - MARGIN * 2) / (level.board_size * 2 * s3 - 2 / s3));
-    document.querySelectorAll('polygon').forEach(function(hexagon) {
+    document.querySelectorAll('.hexagon').forEach(function(hexagon) {
         hexagon.transform.baseVal[1].setTranslate(width / 2, height / 2);
-        hexagon.transform.baseVal[2].setScale(hexagon_size, hexagon_size);
+        hexagon.transform.baseVal[2].setScale(hexagon_size, hexagon_size * s3);
     });
 }
 
 function startGame() {
     let level = Settings.getLevel();
 
-    // document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-    //     if (radio.value === level.name)
-    //         radio.checked = true;
-    // });
-    // document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
+    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
+        if (radio.value === level.name)
+            radio.checked = true;
+    });
+    document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
 
     let board = document.getElementById('board');
     while (board.firstChild) {
@@ -344,34 +327,46 @@ function shuffle(a) {
 
 function createHexagon(info) {
     let board = document.getElementById('board');
-    let elt = document.createElementNS(board.namespaceURI, 'polygon');
-    elt.transform.baseVal.clear();
-    elt.transform.baseVal.appendItem(board.createSVGTransform());
-    elt.transform.baseVal.appendItem(board.createSVGTransform());
-    elt.transform.baseVal.appendItem(board.createSVGTransform());
-    setHexagonPosition(elt, info.position);
-    elt.setAttribute('fill', info.color);
-    elt.setAttribute('id', info.id);
+    let wrapper = document.createElementNS(board.namespaceURI, 'g');
+    wrapper.setAttribute('id', info.id);
+    wrapper.classList.add('hexagon');
+    wrapper.transform.baseVal.clear();
+    wrapper.transform.baseVal.appendItem(board.createSVGTransform());
+    wrapper.transform.baseVal.appendItem(board.createSVGTransform());
+    wrapper.transform.baseVal.appendItem(board.createSVGTransform());
+    wrapper.transform.baseVal.appendItem(board.createSVGTransform());
+    wrapper.transform.baseVal[3].setTranslate(info.position[0], info.position[1]);
+    let polygon = document.createElementNS(board.namespaceURI, 'polygon');
+    polygon.setAttribute('points', [
+        0   , -2.02 / 3,
+       -1.01, -1.01 / 3,
+       -1.01,  1.01 / 3,
+        0   ,  2.02 / 3,
+        1.01,  1.01 / 3,
+        1.01, -1.01 / 3
+   ]);
+   polygon.setAttribute('fill', info.color);
+    wrapper.appendChild(polygon);
     if (info.isMovable) {
-        elt.setAttribute('droppable', true);
-        elt.addEventListener('mousedown', DragAndDrop.start);
-        elt.addEventListener('touchstart', DragAndDrop.start);
+        wrapper.setAttribute('droppable', true);
+        wrapper.addEventListener('mousedown', DragAndDrop.start);
+        wrapper.addEventListener('touchstart', DragAndDrop.start);
+    } else {
+        const s3 = Math.sqrt(3);
+        let fix_mark = document.createElementNS(board.namespaceURI, 'ellipse');
+        fix_mark.classList.add('fix_mark');
+        fix_mark.setAttribute('cx', 0);
+        fix_mark.setAttribute('cy', 0);
+        fix_mark.setAttribute('rx', 0.1);
+        fix_mark.setAttribute('ry', 0.1 / s3);
+        wrapper.appendChild(fix_mark);
     }
 
-    return elt;
+    return wrapper;
 }
 
 function setHexagonPosition(elt, position) {
-    const s3 = Math.sqrt(3);
     let [x, y] = position;
-    elt.setAttribute('points', [
-        x       , y * s3 - 2.02 / s3,
-        x - 1.01, y * s3 - 1.01 / s3,
-        x - 1.01, y * s3 + 1.01 / s3,
-        x       , y * s3 + 2.02 / s3,
-        x + 1.01, y * s3 + 1.01 / s3,
-        x + 1.01, y * s3 - 1.01 / s3
-    ]);
 }
 
 function allCorrect() {

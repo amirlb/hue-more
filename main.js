@@ -169,14 +169,12 @@ function init() {
 }
 
 function setBoardCoordinates() {
-    const MARGIN = 10;
-
     let board = document.getElementById('board');
     let width = board.width.baseVal.value, height = board.height.baseVal.value;
     let level = Settings.getLevel();
     const s3 = Math.sqrt(3);
-    let hexagon_size = Math.min((width - MARGIN * 2) / (level.board_size * 4 - 2),
-                                (height - MARGIN * 2) / (level.board_size * 2 * s3 - 2 / s3));
+    let hexagon_size = Math.min(width / (level.board_size * 4 - 2 + 0.2),
+                                height / (level.board_size * 2 * s3 - 2 / s3 + 0.2));
     document.querySelectorAll('.hexagon').forEach(function(hexagon) {
         hexagon.transform.baseVal.getItem(1).setTranslate(width / 2, height / 2);
         hexagon.transform.baseVal.getItem(2).setScale(hexagon_size, hexagon_size * s3);

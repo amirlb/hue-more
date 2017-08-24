@@ -61,9 +61,9 @@ let DragAndDrop = {
         DragAndDrop.board.querySelectorAll('.hexagon').forEach(function(elt) {
             elt.classList.remove('draggedElement');
             elt.classList.remove('dropTarget');
-            elt.transform.baseVal[0].setTranslate(0, 0);
+            elt.transform.baseVal.getItem(0).setTranslate(0, 0);
             let [x, y] = hexagonLocations[elt.id].current;
-            elt.transform.baseVal[3].setTranslate(x, y);
+            elt.transform.baseVal.getItem(3).setTranslate(x, y);
         });
         DragAndDrop.draggedElement = null;
         DragAndDrop.targetElement = null;
@@ -103,7 +103,7 @@ let DragAndDrop = {
         let position = ('targetTouches' in event) ? event.targetTouches[0] : event;
         let dx = position.clientX - DragAndDrop.origin.x,
             dy = position.clientY - DragAndDrop.origin.y;
-        DragAndDrop.draggedElement.transform.baseVal[0].setTranslate(dx, dy);
+        DragAndDrop.draggedElement.transform.baseVal.getItem(0).setTranslate(dx, dy);
         let underPointer = document.elementFromPoint(position.clientX, position.clientY).closest('[droppable]');
         if (underPointer) {
             if (DragAndDrop.targetElement) {
@@ -178,8 +178,8 @@ function setBoardCoordinates() {
     let hexagon_size = Math.min((width - MARGIN * 2) / (level.board_size * 4 - 2),
                                 (height - MARGIN * 2) / (level.board_size * 2 * s3 - 2 / s3));
     document.querySelectorAll('.hexagon').forEach(function(hexagon) {
-        hexagon.transform.baseVal[1].setTranslate(width / 2, height / 2);
-        hexagon.transform.baseVal[2].setScale(hexagon_size, hexagon_size * s3);
+        hexagon.transform.baseVal.getItem(1).setTranslate(width / 2, height / 2);
+        hexagon.transform.baseVal.getItem(2).setScale(hexagon_size, hexagon_size * s3);
     });
 }
 

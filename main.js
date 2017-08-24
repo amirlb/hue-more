@@ -62,7 +62,8 @@ let DragAndDrop = {
             elt.classList.remove('draggedElement');
             elt.classList.remove('dropTarget');
             elt.transform.baseVal[0].setTranslate(0, 0);
-            elt.transform.baseVal[3].setTranslate(hexagonLocations[elt.id].current[0], hexagonLocations[elt.id].current[1]);
+            let [x, y] = hexagonLocations[elt.id].current;
+            elt.transform.baseVal[3].setTranslate(x, y);
         });
         DragAndDrop.draggedElement = null;
         DragAndDrop.targetElement = null;
@@ -163,7 +164,6 @@ function init() {
     });
 
     window.addEventListener('resize', setBoardCoordinates);
-    DragAndDrop.reset();
 
     startGame();
 }
@@ -200,7 +200,7 @@ function startGame() {
     let colorScheme = randomColorScheme(level.valid_color_diff);
 
     let fixed = [], movable = [];
-    
+
     let n_layers = level.board_size - 1;
     for (let y = -n_layers; y <= n_layers; y++) {
         let max_x = n_layers * 2 - Math.abs(y);
@@ -239,9 +239,9 @@ function startGame() {
         }));
     }
 
-    setTimeout(setBoardCoordinates, 0);
-    
     updateCheckMarks();
+    setTimeout(setBoardCoordinates, 0);
+    DragAndDrop.reset();
 
     let win = document.getElementById('win');
     win.classList.add('hidden');
@@ -335,7 +335,6 @@ function createHexagon(info) {
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
-    wrapper.transform.baseVal[3].setTranslate(info.position[0], info.position[1]);
     let polygon = document.createElementNS(board.namespaceURI, 'polygon');
     polygon.setAttribute('points', [
         0   , -2.02 / 3,
@@ -363,10 +362,6 @@ function createHexagon(info) {
     }
 
     return wrapper;
-}
-
-function setHexagonPosition(elt, position) {
-    let [x, y] = position;
 }
 
 function allCorrect() {

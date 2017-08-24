@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <title>Hue more</title>
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="main.js"></script>
 </head>
 <body onload="init()">
-<div id="container">
-<svg id="board"/>
-<div id="win" class="hidden" onclick="startGame()">
-    <span id="win-text">YOU<br/>WIN!</span>
+<div id="header">
+    <span id="openMenu">
+        <label for="menuToggle">☰</label>
+        <input type="checkbox" id="menuToggle"/>
+        <div id="menu">
+            <span class="setLevel">Easy</span>
+            <span class="setLevel">Medium</span>
+            <span class="setLevel">Hard</span>
+            <span class="setLevel">Extreme</span>
+            <hr/>
+            <input type="checkbox" name="mark_fixed" id="mark_fixed"/><label for="mark_fixed">Mark fixed pieces</label>
+        </div>
+    </span>
+    <span id="appName">Hue more</span>
+    <span id="newGame">↻</span>
 </div>
-<div id="menu">
-    <input type="radio" name="level" id="easy" value="Easy"/><label for="easy">Easy</label>
-    <input type="radio" name="level" id="medium" value="Medium"/><label for="medium">Medium</label>
-    <input type="radio" name="level" id="hard" value="Hard"/><label for="hard">Hard</label>
-    <input type="radio" name="level" id="extreme" value="Extreme"/><label for="extreme">Extreme</label>
-    <div style="margin-top: 4em"></div>
-    <input type="checkbox" name="mark_fixed" id="mark_fixed"/><label for="mark_fixed">Mark fixed pieces</label>
-</div>
-</div>
+<svg id="board" width="100%"/>
+<div id="shimmer"></div>
 </body>
 </html>

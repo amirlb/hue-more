@@ -132,16 +132,18 @@ let DragAndDrop = {
     },
 
     end: function(event) {
+        let doneBefore = allCorrect();
         if (DragAndDrop.draggedElement && DragAndDrop.targetElement) {
             let i1 = DragAndDrop.draggedElement.id,
                 i2 = DragAndDrop.targetElement.id;
             [hexagonLocations[i1].current, hexagonLocations[i2].current] = [hexagonLocations[i2].current, hexagonLocations[i1].current];
         }
+        let doneAfter = allCorrect();
         DragAndDrop.reset();
-        if (allCorrect()) {
-            let win = document.getElementById('win');
-            win.classList.remove('hidden');
-            win.classList.add('appear');
+        if (doneAfter) {
+            if (!doneBefore)
+                document.getElementById('shimmer').classList.add('animate');
+            document.getElementById('newGame').style.display = 'initial';
         }
         event.preventDefault();
     }
@@ -151,9 +153,9 @@ let hexagonLocations = {};
 
 
 function init() {
-    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            Settings.setLevel(this.value);
+    document.querySelectorAll('.setLevel').forEach(function(elt) {
+        elt.addEventListener('click', function() {
+            Settings.setLevel(this.innerText);
             startGame();
         });
     });
@@ -164,6 +166,7 @@ function init() {
     });
 
     window.addEventListener('resize', setBoardCoordinates);
+    document.getElementById('newGame').addEventListener('click', startGame);
 
     startGame();
 }
@@ -184,12 +187,16 @@ function setBoardCoordinates() {
 function startGame() {
     let level = Settings.getLevel();
 
-    document.querySelectorAll('input[type="radio"][name="level"]').forEach(function(radio) {
-        if (radio.value === level.name)
-            radio.checked = true;
+    document.querySelectorAll('.setLevel').forEach(function(elt) {
+        if (elt.innerText === level.name)
+            elt.classList.add('currentLevel');
+        else
+            elt.classList.remove('currentLevel');
     });
     document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
-
+    document.getElementById('newGame').style.display = 'none';
+    document.getElementById('menuToggle').checked = false;
+    
     let board = document.getElementById('board');
     while (board.firstChild) {
         board.removeChild(board.firstChild);
@@ -240,10 +247,7 @@ function startGame() {
     updateCheckMarks();
     setTimeout(setBoardCoordinates, 0);
     DragAndDrop.reset();
-
-    let win = document.getElementById('win');
-    win.classList.add('hidden');
-    win.classList.remove('appear');
+    document.getElementById('shimmer').classList.remove('animate');
 }
 
 function updateCheckMarks() {

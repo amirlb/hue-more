@@ -106,7 +106,7 @@ hr {
 
 label[for="mark_fixed"] {
     cursor: pointer;
-    margin-left: 0.75rem;
+    margin-left: 0.5rem;
 }
 
 label[for="mark_fixed"]::before {

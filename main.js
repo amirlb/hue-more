@@ -168,6 +168,13 @@ function init() {
     window.addEventListener('resize', setBoardCoordinates);
     document.getElementById('newGame').addEventListener('click', startGame);
 
+    document.getElementById('board').addEventListener('mousedown', function() {
+        document.getElementById('menuToggle').checked = false;    
+    });
+    document.getElementById('board').addEventListener('touchdown', function() {
+        document.getElementById('menuToggle').checked = false;    
+    });
+
     startGame();
 }
 

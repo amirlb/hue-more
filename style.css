@@ -9,18 +9,10 @@ html, body {
     html {
         font-size: 42pt;
     }
-    #newGame {
-        top: -24pt;
-        font-size: 96pt;
-    }
 }
 @media not screen and (orientation: portrait) {
     html {
         font-size: 18pt;
-    }
-    #newGame {
-        top: 6pt;
-        font-size: 28pt;
     }
 }
 
@@ -59,7 +51,10 @@ label {
 #newGame {
     cursor: pointer;
     position: absolute;
-    right: 0.25rem;
+    top: 0.5em;
+    right: 0.75rem;
+    height: 1.5rem;
+    width: 1.5rem;
 }
 
 #menuToggle {

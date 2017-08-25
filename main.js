@@ -171,7 +171,7 @@ function init() {
     document.getElementById('board').addEventListener('mousedown', function() {
         document.getElementById('menuToggle').checked = false;    
     });
-    document.getElementById('board').addEventListener('touchdown', function() {
+    document.getElementById('board').addEventListener('touchstart', function() {
         document.getElementById('menuToggle').checked = false;    
     });
 

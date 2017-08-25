@@ -5,17 +5,8 @@ html, body {
     padding: 0;
 }
 
-body {
-    display: flex;
-    flex-direction: column;
-}
-
-#board {
-    flex: 1 100%;
-}
-
 @media screen and (orientation: portrait) {
-    #header {
+    html {
         font-size: 42pt;
     }
     #newGame {
@@ -24,7 +15,7 @@ body {
     }
 }
 @media not screen and (orientation: portrait) {
-    #header {
+    html {
         font-size: 18pt;
     }
     #newGame {
@@ -34,13 +25,25 @@ body {
 }
 
 #header {
-    flex: 0;
+    position: fixed;
+    top: 0;
+    height: 2.5rem;
+    width: 100%;
+    z-index: 1;
     background-color: cornflowerblue;
     color: white;
     text-align: center;
+    line-height: 2.5rem;
+}
+
+#board {
+    position: fixed;
+    top: 2.5rem;
+    height: calc(100% - 2.5rem);
+}
+
+#appName {
     font-family: Montserrat, Arial, sans-serif;
-    padding: 0.75em;
-    z-index: 2;
 }
 
 label {
@@ -50,13 +53,13 @@ label {
 #openMenu {
     cursor: pointer;
     position: absolute;
-    left: 0.75em;
+    left: 0.75rem;
 }
 
 #newGame {
     cursor: pointer;
     position: absolute;
-    right: 0.25em;
+    right: 0.25rem;
 }
 
 #menuToggle {
@@ -65,42 +68,58 @@ label {
 
 #menu {
     display: none;
+    cursor: initial;
 }
 #menuToggle:checked + #menu {
     display: block;
     position: fixed;
-    top: 3.6em;
+    top: 2.5rem;
     left: 0;
     margin: 0;
     bottom: 0;
-    width: 8em;
+    width: 8rem;
     background-color: white;
     border-right: 2px solid cornflowerblue;
     color: black;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 75%;
     text-align: left;
 }
 
 .setLevel {
     display: block;
-    padding-left: 1em;
-    padding: 0.5em;
+    cursor: pointer;
+    margin: 0.1rem;
+    padding: 0.1rem 0.1rem 0.1rem 0.75rem;
 }
 
 .currentLevel {
-    background-color: lightgoldenrodyellow;
+    font-weight: bold;
 }
 
 .setLevel:hover {
-    background-color: #fe6;
+    background-color: lightgoldenrodyellow;
 }
 
 hr {
-    margin: 1em;
+    margin: 0.75rem;
+}
+
+#mark_fixed {
+    display: none;
 }
 
 label[for="mark_fixed"] {
-    font-size: 75%;
+    cursor: pointer;
+    margin-left: 0.75rem;
+}
+
+label[for="mark_fixed"]::before {
+    content: "☐ ";
+}
+
+#mark_fixed:checked + label[for="mark_fixed"]::before {
+    content: "☑ ";
 }
 
 @keyframes shimmer {
@@ -119,7 +138,6 @@ label[for="mark_fixed"] {
     background: linear-gradient(60deg, rgba(255, 255, 255, 0.0) 30%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.0) 70%);
     background-size: 300% 300%;
     background-position: 0% 100%;
-    z-index: 1;
 }
 
 #shimmer.animate {

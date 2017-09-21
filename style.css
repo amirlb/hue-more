@@ -43,18 +43,20 @@ label {
 }
 
 #openMenu {
+    position: absolute;
+    left: 0.5rem;
+}
+
+.svgButton {
     cursor: pointer;
     position: absolute;
-    left: 0.75rem;
+    top: 0.5rem;
+    height: 1.5rem;
+    width: 1.5rem;
 }
 
 #newGame {
-    cursor: pointer;
-    position: absolute;
-    top: 0.5em;
     right: 0.75rem;
-    height: 1.5rem;
-    width: 1.5rem;
 }
 
 #menuToggle {

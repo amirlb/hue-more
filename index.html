@@ -10,7 +10,13 @@
 <body onload="init()">
 <div id="header">
     <span id="openMenu">
-        <label for="menuToggle">☰</label>
+        <label for="menuToggle">
+            <svg class="svgButton" viewbox="0 0 1 1">
+                <path
+                    d="M 0.25 0.25 L 0.75 0.25 M 0.25 0.5 L 0.75 0.5 M 0.25 0.75 L 0.75 0.75"
+                    stroke="white" stroke-width="0.06" stroke-linecap="round" fill="none" />
+            </svg>
+        </label>
         <input type="checkbox" id="menuToggle"/>
         <div id="menu">
             <span class="setLevel">Easy</span>
@@ -22,7 +28,7 @@
         </div>
     </span>
     <span id="appName">Hue more</span>
-    <svg id="newGame" viewbox="0 0 1 1">
+    <svg class="svgButton" id="newGame" viewbox="0 0 1 1">
         <path
             d="M 0.77 0.14 A 0.45 0.45 0 1 1 0.14 0.23"
             stroke="white" stroke-width="0.08" stroke-linecap="round"

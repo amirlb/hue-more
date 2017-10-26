@@ -25,7 +25,7 @@ const Levels = {
         name: 'Extreme',
         board_size: 4,
         fixed_types: ['corner'],
-        valid_color_diff: function(diff) {return 0.015 <= diff && diff < 0.025;}
+        valid_color_diff: function(diff) {return 0.001 <= diff && diff < 0.015;}
     }
 };
 

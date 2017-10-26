@@ -1,29 +1,31 @@
 "use strict";
 
+Math.TAU = Math.PI * 2;
+
 const Levels = {
     Easy: {
         name: 'Easy',
         board_size: 3,
         fixed_types: ['corner', 'side'],
-        valid_color_diff: function(diff) {return diff >= 100;}
+        valid_color_diff: function(diff) {return diff >= 0.1;}
     },
     Medium: {
         name: 'Medium',
         board_size: 4,
         fixed_types: ['corner', 'side'],
-        valid_color_diff: function(diff) {return diff >= 100;}
+        valid_color_diff: function(diff) {return diff >= 0.1;}
     },
     Hard: {
         name: 'Hard',
         board_size: 4,
         fixed_types: ['corner'],
-        valid_color_diff: function(diff) {return diff >= 100;}
+        valid_color_diff: function(diff) {return diff >= 0.08;}
     },
     Extreme: {
         name: 'Extreme',
         board_size: 4,
         fixed_types: ['corner'],
-        valid_color_diff: function(diff) {return 15 <= diff && diff < 30;}
+        valid_color_diff: function(diff) {return 0.015 <= diff && diff < 0.025;}
     }
 };
 
@@ -192,6 +194,7 @@ function setBoardCoordinates() {
 }
 
 function startGame() {
+    const s3 = Math.sqrt(3);
     let level = Settings.getLevel();
 
     document.querySelectorAll('.setLevel').forEach(function(elt) {
@@ -217,7 +220,7 @@ function startGame() {
     for (let y = -n_layers; y <= n_layers; y++) {
         let max_x = n_layers * 2 - Math.abs(y);
         for (let x = -max_x; x <= max_x; x += 2) {
-            let [r, g, b] = applyColorScheme(colorScheme, [x/n_layers/4+0.5, y/n_layers/2+0.5]);
+            let [r, g, b] = applyColorScheme(colorScheme, [x/n_layers/2, 2*y/n_layers/s3]);
             let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
 
             let position_type = 'middle';
@@ -265,35 +268,26 @@ function updateCheckMarks() {
 }
 
 function randomColorScheme(colorCondition) {
-    let tries = 0;
     while (true) {
         let colorScheme = [randomDimension(), randomDimension(), randomDimension()];
-        tries++;
         let diff = colorSchemeScore(colorScheme);
-        // console.log(diff);
         if (colorCondition(diff)) {
-            console.log(tries);
             return colorScheme;
         }
     }
 }
 
 function colorSchemeScore(colorScheme) {
-    let corners = [[0.25,0], [0.75,0], [0,0.5], [1,0.5], [0.25,1], [0.75,1]];
-    let cornerColors = corners.map(function(loc) {
-        return applyColorScheme(colorScheme, loc);
-    });
-    let diff = 1e6;
-    for (let i = 0; i < cornerColors.length; i++)
-        for (let j = 0; j < i; j++)
-            diff = Math.min(diff, colorDifference(cornerColors[i], cornerColors[j]));
-    return diff;
+    let scaleR = colorScheme[0].scale * (1.0 - colorScheme[0].offset);
+    let scaleG = colorScheme[1].scale * (1.0 - colorScheme[1].offset);
+    let scaleB = colorScheme[2].scale * (1.0 - colorScheme[2].offset);
+    let diffRG = scaleR * scaleG * (1 - Math.pow(Math.cos(colorScheme[0].angle - colorScheme[1].angle), 2));
+    let diffRB = scaleR * scaleB * (1 - Math.pow(Math.cos(colorScheme[0].angle - colorScheme[2].angle), 2));
+    let diffGB = scaleG * scaleB * (1 - Math.pow(Math.cos(colorScheme[1].angle - colorScheme[2].angle), 2));
+    return diffRG + diffRB + diffGB;
 }
 
-function applyColorScheme(scheme, xy) {
-    const s3 = Math.sqrt(3);
-    let x = xy[0] * 2 - 1,
-        y = (xy[1] - 0.5) * s3;
+function applyColorScheme(scheme, [x, y]) {
     return scheme.map(function(channel) {
         let dx = channel.scale * Math.cos(channel.angle),
             dy = channel.scale * Math.sin(channel.angle);
@@ -304,17 +298,11 @@ function applyColorScheme(scheme, xy) {
 function randomDimension() {
     let offset = Math.random();
     let scale = 0.999 * Math.sqrt(Math.random()) * Math.min(offset, 1 - offset);
-    let angle = Math.random() * Math.PI * 2;
+        // 0.999 to prevent color overflow & underflow if precision issues arise
+        // sqrt to try to provide higher variation for most color schemes
+        // min(offset, 1-offset) is the max allowed variation
+    let angle = Math.random() * Math.TAU;
     return {offset, scale, angle};
-    let low = Math.random(), high = Math.random();
-    if (high < low) [low, high] = [high, low];
-    let dx = Math.random() * (high - low);
-    let dy = (high - low) - dx;
-    if (Math.random() < 0.5)
-        [low, dy] = [low + dy, -dy];
-    if (Math.random() < 0.5)
-        [low, dx] = [low + dx, -dx];
-    return [low, dx, dy];
 }
 
 function colorDifference(c1, c2) {
@@ -325,7 +313,7 @@ function colorDifference(c1, c2) {
 }
 
 function shuffle(a) {
-    const easy = -1; // only this many swaps
+    const easy = 0; // only this many swaps
     a = a.slice();
     if (easy) {
         for (let i = 0; i < easy; i++) {

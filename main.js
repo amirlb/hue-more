@@ -296,7 +296,7 @@ function applyColorScheme(scheme, [x, y]) {
 }
 
 function randomDimension() {
-    let offset = Math.random();
+    let offset = Math.sqrt(Math.random());
     let scale = 0.999 * Math.sqrt(Math.random()) * Math.min(offset, 1 - offset);
         // 0.999 to prevent color overflow & underflow if precision issues arise
         // sqrt to try to provide higher variation for most color schemes

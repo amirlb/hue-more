@@ -279,15 +279,6 @@ function randomColorScheme(colorCondition) {
 }
 
 function colorSchemeScore(colorScheme) {
-    // green-pink color scheme hurts my eye
-    if (colorScheme[0][1] < -0.1 && colorScheme[1][1] > 0.1)
-        return 0;
-    if (colorScheme[1][1] < -0.1 && colorScheme[0][1] > 0.1)
-        return 0;
-    if (colorScheme[0][2] < -0.1 && colorScheme[1][2] > 0.1)
-        return 0;
-    if (colorScheme[1][2] < -0.1 && colorScheme[0][2] > 0.1)
-        return 0;
     let corners = [[0.25,0], [0.75,0], [0,0.5], [1,0.5], [0.25,1], [0.75,1]];
     let cornerColors = corners.map(function(loc) {
         return applyColorScheme(colorScheme, loc);
@@ -300,13 +291,21 @@ function colorSchemeScore(colorScheme) {
 }
 
 function applyColorScheme(scheme, xy) {
+    const s3 = Math.sqrt(3);
+    let x = xy[0] * 2 - 1,
+        y = (xy[1] - 0.5) * s3;
     return scheme.map(function(channel) {
-        let base = channel[0], dx = channel[1], dy = channel[2];
-        return Math.floor(255 * (base + dx * xy[0] + dy * xy[1]));
+        let dx = channel.scale * Math.cos(channel.angle),
+            dy = channel.scale * Math.sin(channel.angle);
+        return Math.floor(255 * (channel.offset + dx * x + dy * y));
     });
 }
 
 function randomDimension() {
+    let offset = Math.random();
+    let scale = 0.999 * Math.sqrt(Math.random()) * Math.min(offset, 1 - offset);
+    let angle = Math.random() * Math.PI * 2;
+    return {offset, scale, angle};
     let low = Math.random(), high = Math.random();
     if (high < low) [low, high] = [high, low];
     let dx = Math.random() * (high - low);

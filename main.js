@@ -265,29 +265,38 @@ function updateCheckMarks() {
 }
 
 function randomColorScheme(colorCondition) {
-    let corners = [[0.25,0], [0.75,0], [0,0.5], [1,0.5], [0.25,1], [0.75,1]]
+    let tries = 0;
     while (true) {
         let colorScheme = [randomDimension(), randomDimension(), randomDimension()];
-        // green-pink color scheme hurts my eye
-        if (colorScheme[0][1] < -0.1 && colorScheme[1][1] > 0.1)
-            continue;
-        if (colorScheme[1][1] < -0.1 && colorScheme[0][1] > 0.1)
-            continue;
-        if (colorScheme[0][2] < -0.1 && colorScheme[1][2] > 0.1)
-            continue;
-        if (colorScheme[1][2] < -0.1 && colorScheme[0][2] > 0.1)
-            continue;
-        let cornerColors = corners.map(function(loc) {
-            return applyColorScheme(colorScheme, loc);
-        });
-        let diff = 1e6;
-        for (let i = 0; i < cornerColors.length; i++)
-            for (let j = 0; j < i; j++)
-                diff = Math.min(diff, colorDifference(cornerColors[i], cornerColors[j]));
+        tries++;
+        let diff = colorSchemeScore(colorScheme);
+        // console.log(diff);
         if (colorCondition(diff)) {
+            console.log(tries);
             return colorScheme;
         }
     }
+}
+
+function colorSchemeScore(colorScheme) {
+    // green-pink color scheme hurts my eye
+    if (colorScheme[0][1] < -0.1 && colorScheme[1][1] > 0.1)
+        return 0;
+    if (colorScheme[1][1] < -0.1 && colorScheme[0][1] > 0.1)
+        return 0;
+    if (colorScheme[0][2] < -0.1 && colorScheme[1][2] > 0.1)
+        return 0;
+    if (colorScheme[1][2] < -0.1 && colorScheme[0][2] > 0.1)
+        return 0;
+    let corners = [[0.25,0], [0.75,0], [0,0.5], [1,0.5], [0.25,1], [0.75,1]];
+    let cornerColors = corners.map(function(loc) {
+        return applyColorScheme(colorScheme, loc);
+    });
+    let diff = 1e6;
+    for (let i = 0; i < cornerColors.length; i++)
+        for (let j = 0; j < i; j++)
+            diff = Math.min(diff, colorDifference(cornerColors[i], cornerColors[j]));
+    return diff;
 }
 
 function applyColorScheme(scheme, xy) {
@@ -317,7 +326,7 @@ function colorDifference(c1, c2) {
 }
 
 function shuffle(a) {
-    const easy = 0; // only this many swaps
+    const easy = -1; // only this many swaps
     a = a.slice();
     if (easy) {
         for (let i = 0; i < easy; i++) {

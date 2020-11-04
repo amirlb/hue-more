@@ -220,7 +220,7 @@ function startGame() {
     for (let y = -n_layers; y <= n_layers; y++) {
         let max_x = n_layers * 2 - Math.abs(y);
         for (let x = -max_x; x <= max_x; x += 2) {
-            let [r, g, b] = applyColorScheme(colorScheme, [x/n_layers/2, 2*y/n_layers/s3]);
+            let [r, g, b] = applyColorScheme(colorScheme, [x/n_layers/2, s3*y/n_layers/2]);
             let color = 'rgb(' + r + ', ' + g + ', ' + b + ')';
 
             let position_type = 'middle';

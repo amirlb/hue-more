@@ -291,7 +291,7 @@ function applyColorScheme(scheme, [x, y]) {
     return scheme.map(function(channel) {
         let dx = channel.scale * Math.cos(channel.angle),
             dy = channel.scale * Math.sin(channel.angle);
-        return Math.floor(255 * (channel.offset + dx * x + dy * y));
+        return Math.floor(255 * Math.sqrt(channel.offset + dx * x + dy * y));
     });
 }
 

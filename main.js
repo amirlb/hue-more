@@ -145,7 +145,7 @@ let DragAndDrop = {
         if (doneAfter) {
             if (!doneBefore)
                 document.getElementById('shimmer').classList.add('animate');
-            document.getElementById('newGame').style.display = 'initial';
+            document.getElementById('newGame').style.visibility = 'visible';
         }
         event.preventDefault();
     }
@@ -204,7 +204,7 @@ function startGame() {
             elt.classList.remove('currentLevel');
     });
     document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
-    document.getElementById('newGame').style.display = 'none';
+    document.getElementById('newGame').style.visibility = 'hidden';
     document.getElementById('menuToggle').checked = false;
     
     let board = document.getElementById('board');

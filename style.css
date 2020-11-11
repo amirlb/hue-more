@@ -8,23 +8,26 @@ html, body {
 #header {
     position: fixed;
     top: 0;
-    height: 10vh;
+    height: 15vmin;
     width: 100%;
-    font-size: 5vh;
-    line-height: 10vh;
     z-index: 1;
     background-color: cornflowerblue;
-    color: white;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 #board {
     position: fixed;
-    top: 10vh;
-    height: 90vh;
+    left: 0;
+    width: 100%;
+    top: calc(15vmin + 5vh);
+    height: calc(90vh - 15vmin);
 }
 
 #appName {
+    color: white;
+    font-size: 8vmin;
     font-family: Montserrat, Arial, sans-serif;
 }
 
@@ -36,20 +39,19 @@ label {
     cursor: pointer;
 }
 
+#openMenu {
+    height: 70%;
+}
+
 #menuButton {
-    position: fixed;
-    left: 1vh;
-    top: 2vh;
-    width: 6vh;
-    height: 6vh;
+    margin-left: 2vmin;
+    height: 100%;
 }
 
 #newGame {
-    position: fixed;
-    right: 2vh;
-    top: 2.5vh;
-    width: 5vh;
-    height: 5vh;
+    visibility: hidden;
+    margin-right: 3vmin;
+    height: 60%;
 }
 
 #menuToggle {
@@ -63,7 +65,7 @@ label {
 #menuToggle:checked + #menu {
     display: block;
     position: fixed;
-    top: 10vh;
+    top: 15vmin;
     left: 0;
     margin: 0;
     bottom: 0;
@@ -71,15 +73,15 @@ label {
     border-right: 2px solid cornflowerblue;
     color: black;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 3vh;
+    font-size: 5vmin;
     text-align: left;
 }
 
 .setLevel {
     display: block;
     cursor: pointer;
-    margin: 0.5vh;
-    padding: 0.25vh 1vh 0.25vh 1vh;
+    margin: 0.5vmin;
+    padding: 3vmin;
 }
 
 .currentLevel {
@@ -101,8 +103,8 @@ hr {
 label[for="mark_fixed"] {
     display: block;
     cursor: pointer;
-    margin: 0.5vh;
-    padding: 0.25vh 1vh 0.25vh 1vh;
+    margin: 0.5vmin;
+    padding: 3vmin;
 }
 
 label[for="mark_fixed"]::before {

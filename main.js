@@ -43,6 +43,12 @@ let Settings = {
     },
     setMarkFixed: function(markFixed) {
         localStorage.setItem('markFixed', markFixed ? 'true' : 'false');
+    },
+    getTheme: function() {
+        return localStorage.getItem('theme') || 'light';
+    },
+    setTheme: function(theme) {
+        localStorage.setItem('theme', theme);
     }
 };
 
@@ -164,7 +170,13 @@ function init() {
 
     document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
         Settings.setMarkFixed(this.checked);
-        updateCheckMarks();
+        document.getElementById('board').setAttribute('mark_fixed_pieces', this.checked);
+    });
+
+    document.querySelector('input[name="light_mode"]').addEventListener('change', function() {
+        let theme = this.checked ? 'light' : 'dark';
+        Settings.setTheme(theme);
+        document.documentElement.setAttribute('theme', theme);
     });
 
     window.addEventListener('resize', setBoardCoordinates);
@@ -176,6 +188,9 @@ function init() {
     document.getElementById('board').addEventListener('touchstart', function() {
         document.getElementById('menuToggle').checked = false;    
     });
+
+    document.getElementById('board').setAttribute('mark_fixed_pieces', Settings.getMarkFixed());
+    document.documentElement.setAttribute('theme', Settings.getTheme());
 
     startGame();
 }
@@ -204,9 +219,10 @@ function startGame() {
             elt.classList.remove('currentLevel');
     });
     document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
+    document.querySelector('input[name="light_mode"]').checked = Settings.getTheme() === 'light';
     document.getElementById('newGame').style.visibility = 'hidden';
     document.getElementById('menuToggle').checked = false;
-    
+
     let board = document.getElementById('board');
     while (board.firstChild) {
         board.removeChild(board.firstChild);
@@ -254,17 +270,9 @@ function startGame() {
         }));
     }
 
-    updateCheckMarks();
     setTimeout(setBoardCoordinates, 0);
     DragAndDrop.reset();
     document.getElementById('shimmer').classList.remove('animate');
-}
-
-function updateCheckMarks() {
-    let display = Settings.getMarkFixed() ? 'initial' : 'none';
-    document.querySelectorAll('.fix_mark').forEach(function(elt) {
-        elt.style.display = display;
-    });
 }
 
 function randomColorScheme(colorCondition) {

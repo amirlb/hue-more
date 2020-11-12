@@ -1,8 +1,28 @@
+:root {
+    --background-color: white;
+    --text-color: black;
+    --heading-color: cornflowerblue;
+    --icons-color: white;
+    --menu-highlight-color: lightgoldenrodyellow;
+    --shimmer-color-1: rgba(255, 255, 255, 0.0);
+    --shimmer-color-2: rgba(255, 255, 255, 0.75);
+}
+[theme="dark"] {
+    --background-color: black;
+    --text-color: lightgray;
+    --heading-color: darkblue;
+    --icons-color: gray;
+    --menu-highlight-color: #403000;
+    --shimmer-color-1: rgba(250, 250, 210, 0.0);
+    --shimmer-color-2: rgba(250, 250, 210, 0.75);
+}
+
 html, body {
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
+    background-color: var(--background-color);
 }
 
 #header {
@@ -11,7 +31,7 @@ html, body {
     height: 15vmin;
     width: 100%;
     z-index: 1;
-    background-color: cornflowerblue;
+    background-color: var(--heading-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -19,16 +39,14 @@ html, body {
 
 #board {
     position: fixed;
-    left: 0;
-    width: 100%;
     top: calc(15vmin + 5vh);
     height: calc(90vh - 15vmin);
 }
 
 #appName {
-    color: white;
     font-size: 8vmin;
     font-family: Montserrat, Arial, sans-serif;
+    color: var(--icons-color);
 }
 
 label {
@@ -37,6 +55,12 @@ label {
 
 .svgButton {
     cursor: pointer;
+}
+.svgButton > path {
+    stroke: var(--icons-color);
+}
+.svgButton > polygon {
+    fill: var(--icons-color);
 }
 
 #openMenu {
@@ -69,9 +93,9 @@ label {
     left: 0;
     margin: 0;
     bottom: 0;
-    background-color: white;
+    background-color: var(--background-color);
     border-right: 2px solid cornflowerblue;
-    color: black;
+    color: var(--text-color);
     font-family: Arial, Helvetica, sans-serif;
     font-size: 5vmin;
     text-align: left;
@@ -89,7 +113,7 @@ label {
 }
 
 .setLevel:hover {
-    background-color: lightgoldenrodyellow;
+    background-color: var(--menu-highlight-color);
 }
 
 hr {
@@ -115,6 +139,26 @@ label[for="mark_fixed"]::before {
     content: "☑ ";
 }
 
+#light_mode {
+    display: none;
+}
+
+label[for="light_mode"] {
+    display: block;
+    cursor: pointer;
+    margin: 0.5vmin;
+    margin-top: 2vmin;
+    padding: 3vmin;
+}
+
+label[for="light_mode"]::before {
+    content: "🌛";
+}
+
+#light_mode:checked + label[for="light_mode"]::before {
+    content: "🌞";
+}
+
 @keyframes shimmer {
     0% {background-position: 100% 0%;}
     100% {background-position: 0% 100%;}
@@ -128,7 +172,7 @@ label[for="mark_fixed"]::before {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    background: linear-gradient(60deg, rgba(255, 255, 255, 0.0) 30%, rgba(255, 255, 255, 0.75) 50%, rgba(255, 255, 255, 0.0) 70%);
+    background: linear-gradient(60deg, var(--shimmer-color-1) 30%, var(--shimmer-color-2) 50%, var(--shimmer-color-1) 70%);
     background-size: 300% 300%;
     background-position: 0% 100%;
 }
@@ -149,4 +193,8 @@ label[for="mark_fixed"]::before {
 
 .fix_mark {
     fill: black;
+}
+
+#board[mark_fixed_pieces="false"] .fix_mark {
+    display: none;
 }

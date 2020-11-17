@@ -22,14 +22,16 @@ html, body {
     height: 100%;
     margin: 0;
     padding: 0;
+}
+
+body {
     background-color: var(--background-color);
+    display: flex;
+    flex-direction: column;
 }
 
 #header {
-    position: fixed;
-    top: 0;
     height: 12vmin;
-    width: 100%;
     z-index: 1;
     background-color: var(--heading-color);
     display: flex;
@@ -37,19 +39,10 @@ html, body {
     justify-content: space-between;
 }
 
-#board-container {
-    position: fixed;
-    top: 12vmin;
-    bottom: 0;
-    left: 0;
-    width: 100%;
+#board {
+    flex-grow: 1;
     padding-top: 2vh;
     padding-bottom: 2vh;
-}
-
-#board {
-    width: 100%;
-    height: 100%;
 }
 
 #appName {

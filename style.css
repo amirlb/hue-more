@@ -28,7 +28,7 @@ html, body {
 #header {
     position: fixed;
     top: 0;
-    height: 15vmin;
+    height: 12vmin;
     width: 100%;
     z-index: 1;
     background-color: var(--heading-color);
@@ -37,10 +37,17 @@ html, body {
     justify-content: space-between;
 }
 
-#board {
+#board-container {
     position: fixed;
-    top: calc(15vmin + 5vh);
-    height: calc(90vh - 15vmin);
+    top: 12vmin;
+    bottom: 12vmin;
+    padding-top: 5vh;
+    padding-bottom: 5vh;
+}
+
+#board {
+    width: 100%;
+    height: 100%;
 }
 
 #appName {
@@ -89,7 +96,7 @@ label {
 #menuToggle:checked + #menu {
     display: block;
     position: fixed;
-    top: 15vmin;
+    top: 12vmin;
     left: 0;
     margin: 0;
     bottom: 0;

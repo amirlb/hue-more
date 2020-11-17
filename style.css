@@ -40,8 +40,8 @@ html, body {
 #board-container {
     position: fixed;
     top: 12vmin;
-    bottom: 12vmin;
     padding-top: 5vh;
+    padding-bottom: 5vh;
 }
 
 #board {

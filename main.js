@@ -157,6 +157,186 @@ let DragAndDrop = {
     }
 }
 
+let HelpAnimation = {
+    isActive: false,
+
+    start: function() {
+        if (HelpAnimation.isActive)
+            return;
+
+        HelpAnimation.isActive = true;
+        document.getElementById('helpModal').style.display = 'block';
+        document.getElementById('menuToggle').checked = false;
+
+        document.getElementById('thumb').animate([
+            HelpAnimation.locationOf(document.getElementById('helpButton'))
+        ], {
+            fill: 'forwards'
+        });
+
+        if (allCorrect()) {
+            HelpAnimation.moveToMenu();
+        } else {
+            HelpAnimation.solveGame();
+        }
+    },
+
+    locationOf: function(elt) {
+        let bb = document.body.getBoundingClientRect();
+        let eb = elt.getBoundingClientRect();
+        return {
+            left: `${eb.left - bb.left + eb.width / 2}px`,
+            top: `${eb.top - bb.top + eb.height / 2}px`
+        };
+    },
+
+    boardLocationAt: function([x, y]) {
+        let bb = document.body.getBoundingClientRect();
+        let eb = document.getElementById('board').getBoundingClientRect();
+        const s3 = Math.sqrt(3);
+        let level = Settings.getLevel();
+        let board = document.getElementById('board');
+        let width = board.width.baseVal.value, height = board.height.baseVal.value;
+        let hexagon_size = Math.min(width / (level.board_size * 4 - 2 + 0.2),
+                                    height / (level.board_size * 2 * s3 - 2 / s3 + 0.2));
+        return {
+            left: `${eb.left - bb.left + width / 2 + x * hexagon_size}px`,
+            top: `${eb.top - bb.top + height / 2 + y * hexagon_size * s3}px`
+        };
+    },
+
+    moveToMenu: function() {
+        setTimeout(function () {
+            if (!HelpAnimation.isActive)
+                return;
+
+            if (allCorrect()) {
+                document.getElementById('thumb').animate([
+                    HelpAnimation.locationOf(document.getElementById('menuButton'))
+                ], {
+                    duration: 1200,
+                    easing: 'ease-in-out',
+                    fill: 'forwards'
+                }).onfinish = HelpAnimation.openMenu;
+            } else {}
+        }, 50);
+    },
+
+    openMenu: function() {
+        if (!HelpAnimation.isActive)
+            return;
+
+        document.getElementById('menuToggle').checked = true;
+        document.getElementById('thumb').animate([
+            HelpAnimation.locationOf(document.getElementsByClassName('setLevel')[0])
+        ], {
+            duration: 800,
+            easing: 'ease-in-out',
+            fill: 'forwards'
+        }).onfinish = HelpAnimation.startEasyGame;
+    },
+
+    startEasyGame: function() {
+        if (!HelpAnimation.isActive)
+            return;
+
+        Settings.setLevel('Easy');
+        document.getElementById('menuToggle').checked = false;
+        startGame();
+        HelpAnimation.solveGame();
+    },
+
+    solveGame: function() {
+        setTimeout(function() {
+            if (!HelpAnimation.isActive)
+                return;
+
+            let anyChange = false;
+
+            for (let i in hexagonLocations) {
+                if (anyChange) {
+                    break;
+                }
+                if (hexagonLocations[i].current !== hexagonLocations[i].correct) {
+                    anyChange = true;
+                    HelpAnimation.fixPiece(i);
+                }
+            }
+
+            if (!anyChange) {
+                HelpAnimation.moveToRestart();
+            }
+        }, 200);
+    },
+
+    fixPiece: function(i) {
+        document.getElementById('thumb').animate([
+            HelpAnimation.boardLocationAt(hexagonLocations[i].current)
+        ], {
+            duration: 1000,
+            easing: 'ease-in-out',
+            fill: 'forwards'
+        }).onfinish = function() {
+            if (!HelpAnimation.isActive)
+            return;
+
+            document.getElementById('thumb').classList.add('pressed');
+            document.getElementById('thumb').animate([
+                HelpAnimation.boardLocationAt(hexagonLocations[i].correct)
+            ], {
+                duration: 1000,
+                easing: 'ease-in-out',
+                fill: 'forwards'
+            }).onfinish = function() {
+                if (!HelpAnimation.isActive)
+                    return;
+
+                document.getElementById('thumb').classList.remove('pressed');
+                for (let j in hexagonLocations) {
+                    if (hexagonLocations[j].current === hexagonLocations[i].correct) {
+                        hexagonLocations[j].current = hexagonLocations[i].current;
+                        hexagonLocations[i].current = hexagonLocations[i].correct;
+                        document.getElementById(i).transform.baseVal.getItem(3).setTranslate(hexagonLocations[i].current[0], hexagonLocations[i].current[1]);
+                        document.getElementById(j).transform.baseVal.getItem(3).setTranslate(hexagonLocations[j].current[0], hexagonLocations[j].current[1]);
+                    }
+                }
+                HelpAnimation.solveGame();
+            };
+        };
+    },
+
+    moveToRestart: function() {
+        document.getElementById('newGame').style.visibility = 'visible';
+        document.getElementById('shimmer').classList.add('animate');
+        setTimeout(function () {
+            if (!HelpAnimation.isActive)
+                return;
+
+            if (allCorrect()) {
+                document.getElementById('thumb').animate([
+                    HelpAnimation.locationOf(document.getElementById('newGame'))
+                ], {
+                    duration: 2500,
+                    endDelay: 1500,
+                    easing: 'ease-in-out',
+                    fill: 'forwards'
+                }).onfinish = HelpAnimation.end;
+            } else {}
+        }, 1500);
+    },
+
+    end: function() {
+        if (!HelpAnimation.isActive)
+            return;
+
+        HelpAnimation.isActive = false;
+        document.getElementById('helpModal').style.display = 'none';
+        document.getElementById('thumb').classList.remove('pressed');
+        document.getElementById('shimmer').classList.remove('animate');
+    }
+}
+
+
 let hexagonLocations = {};
 
 
@@ -167,6 +347,8 @@ function init() {
             startGame();
         });
     });
+
+    document.getElementById('menuToggle').checked = false;
 
     document.querySelector('input[name="mark_fixed"]').addEventListener('change', function() {
         Settings.setMarkFixed(this.checked);
@@ -180,7 +362,10 @@ function init() {
     });
 
     window.addEventListener('resize', setBoardCoordinates);
-    document.getElementById('newGame').addEventListener('click', startGame);
+    document.getElementById('newGame').addEventListener('click', function () {
+        document.getElementById('helpButton').style.visibility = 'hidden';
+        startGame();
+    });
 
     document.getElementById('board').addEventListener('mousedown', function() {
         document.getElementById('menuToggle').checked = false;    
@@ -192,6 +377,9 @@ function init() {
     document.getElementById('board').setAttribute('mark_fixed_pieces', Settings.getMarkFixed());
     document.documentElement.setAttribute('theme', Settings.getTheme());
 
+    document.getElementById('helpButton').addEventListener('click', HelpAnimation.start);
+    document.getElementById('helpMenu').addEventListener('click', HelpAnimation.start);
+    document.getElementById('helpModal').addEventListener('click', HelpAnimation.end);
     startGame();
 }
 

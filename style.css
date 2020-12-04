@@ -46,7 +46,7 @@ body {
 }
 
 #appName {
-    font-size: 8vmin;
+    font-size: 7vmin;
     font-family: Montserrat, Arial, sans-serif;
     color: var(--icons-color);
 }
@@ -103,7 +103,7 @@ label {
     text-align: left;
 }
 
-.setLevel {
+.setLevel, #helpMenu {
     display: block;
     cursor: pointer;
     margin: 0.5vmin;
@@ -199,4 +199,35 @@ label[for="light_mode"]::before {
 
 #board[mark_fixed_pieces="false"] .fix_mark {
     display: none;
+}
+
+#helpButton {
+    position: absolute;
+    right: 3vmin;
+    bottom: 4vmin;
+    width: 12vmin;
+    height: 12vmin;
+    z-index: 1;
+}
+
+#helpModal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+}
+
+#thumb {
+    position: fixed;
+    width: 6vmin;
+    height: 6vmin;
+    border-radius: 3vmin;
+    background: radial-gradient(var(--text-color) 0.5vmin, transparent 3vmin);
+}
+
+#thumb.pressed {
+    background: radial-gradient(var(--text-color) 2vmin, transparent 3vmin);
 }

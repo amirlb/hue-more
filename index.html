@@ -26,18 +26,33 @@
             <hr/>
             <input type="checkbox" name="mark_fixed" id="mark_fixed"/><label for="mark_fixed">Mark fixed pieces</label>
             <input type="checkbox" name="light_mode" id="light_mode"/><label for="light_mode"></label>
+            <hr/>
+            <span id="helpMenu">How to play?</span>
         </div>
     </span>
     <span id="appName">Hue more</span>
     <svg class="svgButton" id="newGame" viewbox="0 0 1 1">
         <path
             d="M 0.77 0.14 A 0.45 0.45 0 1 1 0.14 0.23"
-            stroke-width="0.08" stroke-linecap="round"
-            fill="none" />
+            stroke-width="0.08" stroke-linecap="round" fill="none" />
         <polygon points="0.04 0.13 0.24 0.33 0.33 0.05" />
     </svg>
 </div>
-<svg id="board"/>
+<svg id="board"></svg>
 <div id="shimmer"></div>
+<svg class="svgButton" id="helpButton" viewbox="0 0 1 1">
+    <defs>
+        <radialGradient id="background">
+          <stop offset="85%" stop-color="var(--heading-color)" />
+          <stop offset="100%" stop-color="var(--background-color)" />
+        </radialGradient>
+    </defs>
+    <circle cx="0.5" cy="0.5" r="0.5" fill="url('#background')" />
+    <path
+        d="M 0.34 0.35 A 0.16 0.125 0 1 1 0.596 0.45 A 0.24 0.1875 0 0 0 0.5 0.6"
+        stroke-width="0.06" stroke-linecap="round" fill="none" />
+    <circle cx="0.5" cy="0.76" r="0.05" fill="var(--icons-color)" />
+</svg>
+<div id="helpModal"><div id="thumb"></div></div>
 </body>
 </html>

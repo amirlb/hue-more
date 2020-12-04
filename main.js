@@ -140,18 +140,18 @@ let DragAndDrop = {
     },
 
     end: function(event) {
-        let doneBefore = allCorrect();
         if (DragAndDrop.draggedElement && DragAndDrop.targetElement) {
             let i1 = DragAndDrop.draggedElement.id,
                 i2 = DragAndDrop.targetElement.id;
             [hexagonLocations[i1].current, hexagonLocations[i2].current] = [hexagonLocations[i2].current, hexagonLocations[i1].current];
         }
-        let doneAfter = allCorrect();
+        let win = allCorrect();
         DragAndDrop.reset();
-        if (doneAfter) {
-            if (!doneBefore)
-                document.getElementById('shimmer').classList.add('animate');
+        if (win) {
+            document.getElementById('shimmer').classList.add('animate');
             document.getElementById('newGame').style.visibility = 'visible';
+        } else {
+            document.getElementById('shimmer').classList.remove('animate');
         }
         event.preventDefault();
     }

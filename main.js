@@ -332,7 +332,6 @@ let HelpAnimation = {
         HelpAnimation.isActive = false;
         document.getElementById('helpModal').style.display = 'none';
         document.getElementById('thumb').classList.remove('pressed');
-        document.getElementById('shimmer').classList.remove('animate');
     }
 }
 

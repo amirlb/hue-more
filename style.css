@@ -49,6 +49,7 @@ body {
     font-size: 7vmin;
     font-family: Montserrat, Arial, sans-serif;
     color: var(--icons-color);
+    user-select: none;
 }
 
 label {

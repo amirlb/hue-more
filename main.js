@@ -278,13 +278,25 @@ let HelpAnimation = {
             fill: 'forwards'
         }).onfinish = function() {
             if (!HelpAnimation.isActive)
-            return;
+                return;
+
+            let elt = document.getElementById(i);
+            document.getElementById('board').removeChild(elt);
+            document.getElementById('board').appendChild(elt);
+            elt.querySelector('.innerWrapper').animate([
+                {
+                    transform: `translate(${hexagonLocations[i].correct[0] - hexagonLocations[i].current[0]}px, ${hexagonLocations[i].correct[1] - hexagonLocations[i].current[1]}px)`
+                }
+            ], {
+                duration: 800,
+                easing: 'ease-in-out'
+            });
 
             document.getElementById('thumb').classList.add('pressed');
             document.getElementById('thumb').animate([
                 HelpAnimation.boardLocationAt(hexagonLocations[i].correct)
             ], {
-                duration: 1000,
+                duration: 800,
                 easing: 'ease-in-out',
                 fill: 'forwards'
             }).onfinish = function() {
@@ -535,6 +547,9 @@ function createHexagon(info) {
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
     wrapper.transform.baseVal.appendItem(board.createSVGTransform());
+    let innerWrapper = document.createElementNS(board.namespaceURI, 'g');
+    innerWrapper.classList.add('innerWrapper');
+    wrapper.appendChild(innerWrapper);
     let polygon = document.createElementNS(board.namespaceURI, 'polygon');
     polygon.setAttribute('points', [
         0   , -2.02 / 3,
@@ -543,9 +558,9 @@ function createHexagon(info) {
         0   ,  2.02 / 3,
         1.01,  1.01 / 3,
         1.01, -1.01 / 3
-   ]);
-   polygon.setAttribute('fill', info.color);
-    wrapper.appendChild(polygon);
+    ]);
+    polygon.setAttribute('fill', info.color);
+    innerWrapper.appendChild(polygon);
     if (info.isMovable) {
         wrapper.setAttribute('droppable', true);
         wrapper.addEventListener('mousedown', DragAndDrop.start);

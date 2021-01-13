@@ -88,6 +88,7 @@ label {
 #menu {
     display: none;
     cursor: initial;
+    overflow-y: auto;
 }
 #menuToggle:checked + #menu {
     display: block;

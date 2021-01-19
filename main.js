@@ -413,9 +413,9 @@ function startGame() {
 
     document.querySelectorAll('.setLevel').forEach(function(elt) {
         if (elt.innerText === level.name)
-            elt.classList.add('currentLevel');
+            elt.classList.add('selectedMenuItem');
         else
-            elt.classList.remove('currentLevel');
+            elt.classList.remove('selectedMenuItem');
     });
     document.querySelector('input[name="mark_fixed"]').checked = Settings.getMarkFixed();
     document.querySelector('input[name="light_mode"]').checked = Settings.getTheme() === 'light';

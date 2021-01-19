@@ -19,15 +19,15 @@
         </label>
         <input type="checkbox" id="menuToggle"/>
         <div id="menu">
-            <span class="setLevel">Easy</span>
-            <span class="setLevel">Medium</span>
-            <span class="setLevel">Hard</span>
-            <span class="setLevel">Extreme</span>
+            <span class="menuItem setLevel">Easy</span>
+            <span class="menuItem setLevel">Medium</span>
+            <span class="menuItem setLevel">Hard</span>
+            <span class="menuItem setLevel">Extreme</span>
             <hr/>
-            <input type="checkbox" name="mark_fixed" id="mark_fixed"/><label for="mark_fixed">Mark fixed pieces</label>
-            <input type="checkbox" name="light_mode" id="light_mode"/><label for="light_mode"></label>
+            <label class="menuItem"><input type="checkbox" name="mark_fixed" id="mark_fixed"/><span> Mark fixed pieces</span></label>
+            <label class="menuItem"><input type="checkbox" name="light_mode" id="light_mode"/><span></span></label>
             <hr/>
-            <span id="helpMenu">How to play?</span>
+            <span class="menuItem" id="helpMenu">How to play?</span>
         </div>
     </span>
     <span id="appName">Hue more</span>
@@ -41,13 +41,6 @@
 <svg id="board"></svg>
 <div id="shimmer"></div>
 <svg class="svgButton" id="helpButton" viewbox="0 0 1 1">
-    <defs>
-        <radialGradient id="background">
-          <stop offset="85%" stop-color="var(--heading-color)" />
-          <stop offset="100%" stop-color="var(--background-color)" />
-        </radialGradient>
-    </defs>
-    <circle cx="0.5" cy="0.5" r="0.5" fill="url('#background')" />
     <path
         d="M 0.34 0.35 A 0.16 0.125 0 1 1 0.596 0.45 A 0.24 0.1875 0 0 0 0.5 0.6"
         stroke-width="0.06" stroke-linecap="round" fill="none" />

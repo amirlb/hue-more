@@ -88,7 +88,6 @@ label {
 #menu {
     display: none;
     cursor: initial;
-    overflow-y: auto;
 }
 #menuToggle:checked + #menu {
     display: block;
@@ -100,23 +99,23 @@ label {
     background-color: var(--background-color);
     border-right: 2px solid var(--heading-color);
     color: var(--text-color);
+}
+
+.menuItem {
+    display: block;
+    cursor: pointer;
+    margin: 0.1em;
+    padding: 0.6em;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 5vmin;
+    font-size: min(5vw, 4vh);
     text-align: left;
 }
 
-.setLevel, #helpMenu {
-    display: block;
-    cursor: pointer;
-    margin: 0.5vmin;
-    padding: 3vmin;
-}
-
-.currentLevel {
+.selectedMenuItem {
     font-weight: bold;
 }
 
-.setLevel:hover {
+.menuItem:hover {
     background-color: var(--menu-highlight-color);
 }
 
@@ -128,18 +127,11 @@ hr {
     display: none;
 }
 
-label[for="mark_fixed"] {
-    display: block;
-    cursor: pointer;
-    margin: 0.5vmin;
-    padding: 3vmin;
-}
-
-label[for="mark_fixed"]::before {
+#mark_fixed + span::before {
     content: "☐ ";
 }
 
-#mark_fixed:checked + label[for="mark_fixed"]::before {
+#mark_fixed:checked + span::before {
     content: "☑ ";
 }
 
@@ -147,19 +139,11 @@ label[for="mark_fixed"]::before {
     display: none;
 }
 
-label[for="light_mode"] {
-    display: block;
-    cursor: pointer;
-    margin: 0.5vmin;
-    margin-top: 2vmin;
-    padding: 3vmin;
-}
-
-label[for="light_mode"]::before {
+#light_mode + span::before {
     content: "🌛";
 }
 
-#light_mode:checked + label[for="light_mode"]::before {
+#light_mode:checked + span::before {
     content: "🌞";
 }
 
@@ -210,6 +194,9 @@ label[for="light_mode"]::before {
     width: 12vmin;
     height: 12vmin;
     z-index: 1;
+    background-color: var(--heading-color);
+    border-radius: 50%;
+    box-shadow: 0 0.3vmin 0.5vmin -0.1vmin rgba(0, 0, 0, 0.25), 0 0 2vmin 0 rgba(0, 0, 0, 0.125);
 }
 
 #helpModal {

@@ -111,12 +111,13 @@ label {
     text-align: left;
 }
 
-.selectedMenuItem {
-    font-weight: bold;
+/* conditioning on span since mobile browsers like to keep the hover property after toggling checkboxes */
+span.menuItem:hover {
+    background-color: var(--menu-highlight-color);
 }
 
-.menuItem:hover {
-    background-color: var(--menu-highlight-color);
+.selectedMenuItem {
+    font-weight: bold;
 }
 
 hr {

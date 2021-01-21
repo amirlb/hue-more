@@ -391,6 +391,15 @@ function init() {
     document.getElementById('helpButton').addEventListener('click', HelpAnimation.start);
     document.getElementById('helpMenu').addEventListener('click', HelpAnimation.start);
     document.getElementById('helpModal').addEventListener('click', HelpAnimation.end);
+
+    window.addEventListener("beforeinstallprompt", function(installEvent) {
+        installEvent.preventDefault();
+        document.getElementById('installButton').style.display = 'block';
+        document.getElementById('installButton').addEventListener('click', function() {
+            installEvent.prompt();
+        });
+    });
+
     startGame();
 }
 

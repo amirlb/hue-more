@@ -98,7 +98,7 @@ label {
     left: 0;
     margin: 0;
     bottom: 0;
-    padding-right: 12vmin;
+    padding-right: 3vmin;
     background: linear-gradient(to left,
         transparent,
         rgba(0, 0, 0, 0.0125) 0.5vmin,
@@ -115,6 +115,8 @@ label {
     cursor: pointer;
     margin: 0.1em;
     padding: 0.6em;
+    padding-top: min(0.6em, 1.5vh);
+    padding-bottom: min(0.6em, 1.5vh);
     font-family: Arial, Helvetica, sans-serif;
     font-size: min(5vw, 4vh);
     text-align: left;

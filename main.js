@@ -2,6 +2,10 @@
 
 Math.TAU = Math.PI * 2;
 
+if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/hue-more/sw.js', {scope: '/hue-more/'});
+}
+
 const Levels = {
     Easy: {
         name: 'Easy',

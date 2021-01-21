@@ -101,11 +101,12 @@ label {
     padding-right: 12vmin;
     background: linear-gradient(to left,
         transparent,
-        rgb(0, 0, 0, 0.02) 2vmin,
-        rgb(0, 0, 0, 0.1) 4vmin,
-        rgb(0, 0, 0, 0.2) 6vmin,
-        rgb(0, 0, 0, 0.5) 12vmin,
-        var(--menu-background-color) 12vmin);
+        rgba(0, 0, 0, 0.0125) 0.5vmin,
+        rgba(0, 0, 0, 0.05) 1vmin,
+        rgba(0, 0, 0, 0.2) 2vmin,
+        rgba(0, 0, 0, 0.3125) 2.5vmin,
+        rgba(0, 0, 0, 0.5) 3vmin,
+        var(--menu-background-color) 3vmin);
     color: var(--text-color);
 }
 

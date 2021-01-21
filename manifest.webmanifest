@@ -1,7 +1,7 @@
 {
     "background_color": "white",
     "description": "Color matching game",
-    "display": "fullscreen",
+    "display": "standalone",
     "icons": [
         {
             "src": "icon-192.png",

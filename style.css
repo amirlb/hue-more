@@ -115,8 +115,8 @@ label {
     cursor: pointer;
     margin: 0.1em;
     padding: 0.6em;
-    padding-top: min(0.6em, 1.5vh);
-    padding-bottom: min(0.6em, 1.5vh);
+    padding-top: min(0.6em, 1.25vh);
+    padding-bottom: min(0.6em, 1.25vh);
     font-family: Arial, Helvetica, sans-serif;
     font-size: min(5vw, 4vh);
     text-align: left;

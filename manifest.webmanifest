@@ -15,5 +15,5 @@
         }
     ],
     "name": "Hue more",
-    "start_url": "index.html"
+    "start_url": "/hue-more/index.html"
   }

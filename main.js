@@ -33,7 +33,7 @@ const Levels = {
     },
     Golden: {
         name: 'Golden',
-        board_size: 5,
+        board_size: 8,
         fixed_types: ['corner'],
         valid_color_diff: function(diff) {return 0.001 <= diff && diff < 0.008;}
     }
